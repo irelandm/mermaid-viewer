@@ -26,7 +26,7 @@ Single-developer kanban workflow executing 37 MVP stories across 7 epics in sequ
 | # | Story | Prerequisite | Exit Criteria | Status |
 |---|-------|--------------|---------------|--------|
 | 1.1 | Initialize Vite React TypeScript Project | None | `npm run dev` works, React 18.x confirmed | Done |
-| 1.2 | Install Core Dependencies | 1.1 | All packages in package.json, node_modules populated | To Do |
+| 1.2 | Install Core Dependencies | 1.1 | All packages in package.json, node_modules populated | Done |
 | 1.3 | Configure Tailwind CSS with Dark Mode | 1.2 | Tailwind utilities working, dark mode default, color tokens defined | To Do |
 | 1.4 | Set Up React Context & State Management | 1.3 | AppContext provider wrapping app, useAppState hook exportable | To Do |
 | 1.5 | Create Project Directory Structure | 1.4 | Folder structure created, .gitignore in place | To Do |
