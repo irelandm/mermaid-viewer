@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mermaid Diagram Explorer - Design Directions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0e27;
+            color: #f0f2f5;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        header {
+            margin-bottom: 32px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            color: #f0f2f5;
+        }
+
+        p {
+            font-size: 14px;
+            color: #b3bcc5;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #2d3748;
+            padding-bottom: 12px;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            color: #8891a0;
+            cursor: pointer;
+            font-size: 14px;
+            border-bottom: 2px solid transparent;
+            transition: all 150ms;
+            white-space: nowrap;
+        }
+
+        .nav-tab:hover {
+            color: #d0d5dd;
+        }
+
+        .nav-tab.active {
+            color: #00d4ff;
+            border-bottom-color: #00d4ff;
+        }
+
+        .mockup {
+            display: none;
+            background: #0a0e27;
+            border: 1px solid #2d3748;
+            border-radius: 8px;
+            overflow: hidden;
+            min-height: 600px;
+            animation: fadeIn 200ms;
+        }
+
+        .mockup.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Compact Minimalist */
+        .mockup-compact {
+            flex-direction: column;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 4px;
+            padding: 8px;
+            background: #0f1428;
+            border-bottom: 1px solid #2d3748;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 6px 12px;
+            background: #1a202c;
+            border: 1px solid #2d3748;
+            color: #d0d5dd;
+            cursor: pointer;
+            font-size: 12px;
+            border-radius: 4px;
+            transition: all 150ms;
+        }
+
+        .btn:hover {
+            background: #2d3748;
+            border-color: #4a5568;
+        }
+
+        .btn:focus {
+            outline: 2px solid #00d4ff;
+            outline-offset: 2px;
+        }
+
+        .input-search {
+            padding: 6px 12px;
+            background: #1a202c;
+            border: 1px solid #2d3748;
+            color: #d0d5dd;
+            font-size: 12px;
+            border-radius: 4px;
+            width: 150px;
+        }
+
+        .input-search::placeholder {
+            color: #6b7280;
+        }
+
+        .separator {
+            width: 1px;
+            height: 20px;
+            background: #2d3748;
+            margin: 0 4px;
+        }
+
+        .content-area {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .canvas {
+            flex: 1;
+            background: #0a0e27;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border-right: 1px solid #2d3748;
+        }
+
+        .diagram-placeholder {
+            text-align: center;
+            color: #6b7280;
+        }
+
+        .sample-node {
+            width: 80px;
+            height: 40px;
+            background: #2d3748;
+            border: 2px solid #4a5568;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #d0d5dd;
+            margin: 8px;
+            cursor: pointer;
+            transition: all 150ms;
+        }
+
+        .sample-node:hover {
+            background: #1a202c;
+            border-color: #6b7280;
+        }
+
+        .sample-node.selected {
+            background: #00d4ff;
+            color: #0a0e27;
+            border-color: #00d4ff;
+            box-shadow: 0 0 12px rgba(0, 212, 255, 0.3);
+        }
+
+        .side-panel {
+            width: 280px;
+            background: #0f1428;
+            border-left: 1px solid #2d3748;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .panel-section {
+            border-bottom: 1px solid #2d3748;
+            padding-bottom: 12px;
+        }
+
+        .panel-section:last-child {
+            border-bottom: none;
+        }
+
+        .panel-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #8891a0;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .panel-content {
+            font-size: 13px;
+            color: #b3bcc5;
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            background: #1a202c;
+            border: 1px solid #2d3748;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #d0d5dd;
+            pointer-events: none;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Balanced Layout */
+        .mockup-balanced .content-area {
+            flex-direction: row;
+        }
+
+        .sidebar {
+            width: 200px;
+            background: #0f1428;
+            border-right: 1px solid #2d3748;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow-y: auto;
+        }
+
+        .sidebar-item {
+            padding: 8px 12px;
+            background: #1a202c;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #b3bcc5;
+            cursor: pointer;
+            transition: all 150ms;
+        }
+
+        .sidebar-item:hover {
+            background: #2d3748;
+            color: #d0d5dd;
+        }
+
+        /* Canvas First */
+        .mockup-canvas-first .side-panel {
+            position: absolute;
+            right: 0;
+            top: 40px;
+            bottom: 0;
+            background: rgba(15, 20, 40, 0.95);
+            backdrop-filter: blur(4px);
+            width: 280px;
+            border-left: 1px solid #2d3748;
+            display: none;
+            z-index: 10;
+        }
+
+        .mockup-canvas-first .side-panel.visible {
+            display: flex;
+        }
+
+        /* Mode Based */
+        .mode-buttons {
+            display: flex;
+            gap: 4px;
+        }
+
+        .mode-btn {
+            padding: 6px 12px;
+            background: #1a202c;
+            border: 1px solid #2d3748;
+            color: #8891a0;
+            cursor: pointer;
+            font-size: 12px;
+            border-radius: 4px;
+            transition: all 150ms;
+        }
+
+        .mode-btn.active {
+            background: #00d4ff;
+            color: #0a0e27;
+            border-color: #00d4ff;
+        }
+
+        .description {
+            margin-bottom: 16px;
+            padding: 12px;
+            background: #0f1428;
+            border-left: 3px solid #00d4ff;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #b3bcc5;
+        }
+
+        .grid-demo {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding: 16px;
+        }
+
+        .grid-item {
+            background: #1a202c;
+            padding: 12px;
+            border-radius: 4px;
+            border: 1px solid #2d3748;
+            text-align: center;
+            color: #8891a0;
+            font-size: 12px;
+        }
+
+        .grid-item.selected {
+            background: #00d4ff;
+            color: #0a0e27;
+            border-color: #00d4ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎨 Mermaid Diagram Explorer – Design Directions</h1>
+            <p>Five visual approaches to explore. Click tabs to compare layouts, color usage, and interaction patterns.</p>
+        </header>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showMockup('compact')">1. Compact Minimalist</button>
+            <button class="nav-tab" onclick="showMockup('balanced')">2. Balanced Sidebar</button>
+            <button class="nav-tab" onclick="showMockup('toolbar')">3. Toolbar-Heavy</button>
+            <button class="nav-tab" onclick="showMockup('canvas')">4. Canvas-First</button>
+            <button class="nav-tab" onclick="showMockup('mode')">5. Mode-Based Toggle</button>
+        </div>
+
+        <!-- Mockup 1: Compact Minimalist -->
+        <div id="compact" class="mockup mockup-compact active">
+            <div class="description">
+                <strong>Compact Minimalist:</strong> Single-row toolbar, narrow side panel (280px), maximum canvas space. Best for focused node exploration. Side panel always visible but tucked.
+            </div>
+            <div class="toolbar">
+                <button class="btn">📁 Open</button>
+                <input type="text" class="input-search" placeholder="Search nodes...">
+                <div class="separator"></div>
+                <button class="btn">+</button>
+                <button class="btn">−</button>
+                <button class="btn">Reset View</button>
+                <div class="separator"></div>
+                <select style="padding: 6px 12px; background: #1a202c; border: 1px solid #2d3748; color: #d0d5dd; border-radius: 4px; font-size: 12px; cursor: pointer;">
+                    <option>Dark Theme</option>
+                    <option>Light Theme</option>
+                </select>
+            </div>
+            <div class="content-area">
+                <div class="canvas">
+                    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 400px;">
+                        <div class="sample-node">Start</div>
+                        <div class="sample-node selected">Process A</div>
+                        <div class="sample-node">Decision</div>
+                        <div class="sample-node">End</div>
+                        <div style="font-size: 12px; color: #6b7280; text-align: center; width: 100%;">← Click nodes to select</div>
+                    </div>
+                </div>
+                <div class="side-panel">
+                    <div class="panel-section">
+                        <div class="panel-title">Selected Node</div>
+                        <div class="panel-content">
+                            <strong>ID:</strong> process_a<br>
+                            <strong>Label:</strong> Process A<br>
+                        </div>
+                    </div>
+                    <div class="panel-section">
+                        <div class="panel-title">Connected Edges</div>
+                        <div class="panel-content">
+                            → Decision<br>
+                            ← Start
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mockup 2: Balanced Sidebar -->
+        <div id="balanced" class="mockup mockup-balanced">
+            <div class="description">
+                <strong>Balanced Sidebar:</strong> Left sidebar (200px) with collapsed sections, toolbar across top, right side panel. Balanced information hierarchy.
+            </div>
+            <div style="display: flex; flex-direction: column; width: 100%; height: 100%;">
+                <div class="toolbar">
+                    <button class="btn">📁 Open</button>
+                    <input type="text" class="input-search" placeholder="Search...">
+                    <div class="separator"></div>
+                    <button class="btn">+</button>
+                    <button class="btn">−</button>
+                    <button class="btn">Reset</button>
+                </div>
+                <div class="content-area">
+                    <div class="sidebar">
+                        <div class="panel-title">Diagram Info</div>
+                        <div class="sidebar-item">📊 Stats</div>
+                        <div class="sidebar-item">🔍 Search</div>
+                        <div class="sidebar-item">⚙️ Settings</div>
+                        <div class="panel-title" style="margin-top: 12px;">Layers</div>
+                        <div class="sidebar-item">Layer 1</div>
+                        <div class="sidebar-item">Layer 2</div>
+                    </div>
+                    <div class="canvas" style="border-right: 1px solid #2d3748;">
+                        <div class="grid-demo">
+                            <div class="grid-item">Node A</div>
+                            <div class="grid-item">Node B</div>
+                            <div class="grid-item selected">Node C</div>
+                            <div class="grid-item">Node D</div>
+                            <div class="grid-item">Node E</div>
+                            <div class="grid-item">Node F</div>
+                        </div>
+                    </div>
+                    <div class="side-panel" style="width: 240px;">
+                        <div class="panel-section">
+                            <div class="panel-title">Node Details</div>
+                            <div class="panel-content"><strong>Node C</strong><br>Type: Process</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mockup 3: Toolbar-Heavy -->
+        <div id="toolbar" class="mockup">
+            <div class="description">
+                <strong>Toolbar-Heavy:</strong> All controls visible in multi-row toolbar, maximum canvas. Controls grouped by function. Best for power users.
+            </div>
+            <div style="display: flex; flex-direction: column; width: 100%; height: 100%;">
+                <div style="display: flex; flex-direction: column; gap: 8px; padding: 12px; background: #0f1428; border-bottom: 1px solid #2d3748;">
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button class="btn">📁 Open File</button>
+                        <div class="separator"></div>
+                        <input type="text" class="input-search" placeholder="Search nodes...">
+                    </div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <span style="font-size: 12px; color: #6b7280;">Navigation:</span>
+                        <button class="btn">+ Zoom In</button>
+                        <button class="btn">− Zoom Out</button>
+                        <button class="btn">Reset View</button>
+                        <span style="font-size: 12px; color: #6b7280; margin-left: 12px;">Options:</span>
+                        <button class="btn">✓ Grid</button>
+                        <button class="btn">🔍 Fit All</button>
+                    </div>
+                </div>
+                <div class="content-area" style="border-right: none;">
+                    <div class="canvas">
+                        <div style="text-align: center;">
+                            <div style="font-size: 14px; margin-bottom: 16px; color: #b3bcc5;">Sample Flowchart (Mermaid)</div>
+                            <svg width="200" height="120" style="background: transparent;">
+                                <rect x="40" y="10" width="120" height="40" fill="#2d3748" stroke="#4a5568" stroke-width="2" rx="4"/>
+                                <text x="100" y="35" text-anchor="middle" fill="#d0d5dd" font-size="12">Start Process</text>
+                                <line x1="100" y1="50" x2="100" y2="70" stroke="#4a5568" stroke-width="2"/>
+                                <rect x="40" y="70" width="120" height="40" fill="#00d4ff" stroke="#00d4ff" stroke-width="2" rx="4"/>
+                                <text x="100" y="95" text-anchor="middle" fill="#0a0e27" font-size="12">Selected Node</text>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="side-panel" style="width: 220px;">
+                        <div class="panel-section">
+                            <div class="panel-title">Node Info</div>
+                            <div class="panel-content">ID: node_001<br>Label: Selected Node<br>Type: Process</div>
+                        </div>
+                        <div class="panel-section">
+                            <div class="panel-title">Connections</div>
+                            <div class="panel-content">Incoming: 1<br>Outgoing: 2</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mockup 4: Canvas-First -->
+        <div id="canvas" class="mockup mockup-canvas-first">
+            <div class="description">
+                <strong>Canvas-First:</strong> Minimal toolbar, side panel hidden by default. Panel appears only when a node is selected. Maximum focus on diagram.
+            </div>
+            <div style="display: flex; flex-direction: column; width: 100%; height: 100%;">
+                <div class="toolbar" style="gap: 8px;">
+                    <button class="btn">📁 Open</button>
+                    <input type="text" class="input-search" placeholder="Search..." style="width: 120px;">
+                    <button class="btn">+</button>
+                    <button class="btn">−</button>
+                    <button class="btn">Reset</button>
+                    <button class="btn" style="margin-left: auto;">⚙️</button>
+                </div>
+                <div class="content-area" style="position: relative; border: none;">
+                    <div class="canvas" style="border: none;">
+                        <div style="display: flex; flex-direction: column; gap: 16px;">
+                            <div class="sample-node" style="width: 100px; height: 50px;">Start</div>
+                            <div class="sample-node selected" style="width: 100px; height: 50px;">Main Node</div>
+                            <div class="sample-node" style="width: 100px; height: 50px;">End</div>
+                            <div style="font-size: 12px; color: #6b7280; margin-top: 16px;">← Click a node to see details →</div>
+                        </div>
+                    </div>
+                    <div class="side-panel visible">
+                        <div class="panel-section">
+                            <div class="panel-title">Details</div>
+                            <div class="panel-content">
+                                <strong>Main Node</strong><br>
+                                ID: main_001<br>
+                                Type: Process<br>
+                                Status: Active
+                            </div>
+                        </div>
+                        <div class="panel-section">
+                            <div class="panel-title">Links</div>
+                            <div class="panel-content">→ End<br>← Start</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mockup 5: Mode-Based Toggle -->
+        <div id="mode" class="mockup">
+            <div class="description">
+                <strong>Mode-Based Toggle:</strong> Switch between "Explore" mode (full canvas) and "Inspect" mode (side panel visible). User controls focus.
+            </div>
+            <div style="display: flex; flex-direction: column; width: 100%; height: 100%;">
+                <div class="toolbar">
+                    <button class="btn">📁 Open</button>
+                    <input type="text" class="input-search" placeholder="Search...">
+                    <div class="separator"></div>
+                    <span style="font-size: 12px; color: #6b7280; margin-left: 12px;">Mode:</span>
+                    <div class="mode-buttons">
+                        <button class="mode-btn active">🔭 Explore</button>
+                        <button class="mode-btn">🔍 Inspect</button>
+                    </div>
+                    <div class="separator"></div>
+                    <button class="btn">+</button>
+                    <button class="btn">−</button>
+                    <button class="btn">Reset</button>
+                </div>
+                <div class="content-area" style="border-right: none;">
+                    <div class="canvas">
+                        <div style="text-align: center;">
+                            <div style="margin-bottom: 16px; color: #b3bcc5; font-size: 13px;">Explore Mode: Full Canvas Focus</div>
+                            <div class="grid-demo" style="max-width: 400px;">
+                                <div class="grid-item">A</div>
+                                <div class="grid-item selected">B</div>
+                                <div class="grid-item">C</div>
+                                <div class="grid-item">D</div>
+                                <div class="grid-item">E</div>
+                                <div class="grid-item">F</div>
+                            </div>
+                            <div style="font-size: 12px; color: #6b7280; margin-top: 12px;">Switch to Inspect mode for details</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showMockup(id) {
+            // Hide all mockups
+            document.querySelectorAll('.mockup').forEach(m => m.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+
+            // Show selected mockup
+            document.getElementById(id).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
