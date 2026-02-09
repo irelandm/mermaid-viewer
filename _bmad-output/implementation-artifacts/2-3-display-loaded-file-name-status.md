@@ -44,3 +44,16 @@ As a user, I want to see the name of the currently loaded file displayed in the 
 - Parse is called immediately after file.text() succeeds — single flow, no intermediate renders needed
 - Error in file name area uses red text styling consistent with Status component error styling
 - On parse error, fileName is still set (user can see which file failed) but mermaidCode stays null
+
+## Code Review Status
+**Date:** 2026-02-09  
+**Reviewer:** Deveshi (Adversarial Review)  
+**Status:** ✅ **APPROVED** - All findings addressed
+
+### Code Review Findings Fixed
+1. ✅ Race condition guard added to Toolbar.handleFileSelect
+2. ✅ TypeScript types fixed (no `any` types)
+3. ✅ React Fast Refresh compliance (AppContext split into separate files)
+4. ✅ Test coverage gap filled (file re-selection test added)
+
+All recommendations from code review implemented and committed.
