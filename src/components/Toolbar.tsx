@@ -1,5 +1,6 @@
 import { useRef } from 'react'
 import { useAppState } from '../context/useAppState'
+import { parseMarkdown } from '../utils/parseMarkdown'
 
 export function Toolbar() {
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -31,6 +32,11 @@ export function Toolbar() {
 
       const content = await file.text()
       dispatch({ type: 'SET_FILE_CONTENT', payload: content })
+
+      // Parse markdown and extract mermaid code block
+      const mermaidCode = parseMarkdown(content)
+      dispatch({ type: 'SET_MERMAID_CODE', payload: mermaidCode })
+      dispatch({ type: 'SET_ERROR', payload: null })
 
       dispatch({
         type: 'SET_STATUS',
@@ -78,11 +84,17 @@ export function Toolbar() {
         aria-hidden="true"
       />
 
-      {state.fileName && (
-        <div className="flex-1 min-w-0 text-sm text-gray-300">
-          <span className="text-gray-400">File:</span> <span className="truncate">{state.fileName}</span>
+      {state.error && state.fileName ? (
+        <div className="flex-1 min-w-0 text-sm text-red-400" role="alert">
+          <span className="text-red-500">Error:</span>{' '}
+          <span className="truncate">{state.error}</span>
         </div>
-      )}
+      ) : state.fileName ? (
+        <div className="flex-1 min-w-0 text-sm text-gray-300">
+          <span className="text-gray-400">File:</span>{' '}
+          <span className="truncate">{state.fileName}</span>
+        </div>
+      ) : null}
     </div>
   )
 }
