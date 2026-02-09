@@ -125,7 +125,7 @@ describe('Toolbar – Story 2.3: Display Loaded File Name & Status', () => {
 
       await waitFor(() => {
         expect(screen.getByText('Error:')).toBeInTheDocument()
-        expect(screen.getByText('No mermaid code block found in markdown')).toBeInTheDocument()
+        expect(screen.getByText(/No Mermaid diagram found in this file/)).toBeInTheDocument()
       })
     })
 
@@ -144,7 +144,7 @@ describe('Toolbar – Story 2.3: Display Loaded File Name & Status', () => {
       await waitFor(() => {
         const alertEl = screen.getByRole('alert')
         expect(alertEl).toBeInTheDocument()
-        expect(alertEl).toHaveTextContent('No mermaid code block found in markdown')
+        expect(alertEl).toHaveTextContent(/No Mermaid diagram found in this file/)
       })
     })
 
@@ -235,6 +235,332 @@ describe('Toolbar – Story 2.3: Display Loaded File Name & Status', () => {
 
       expect(screen.queryByText('File:')).not.toBeInTheDocument()
       expect(screen.queryByText('Error:')).not.toBeInTheDocument()
+    })
+  })
+})
+
+describe('Toolbar – Story 2.4: Handle File Parse Errors & Provide Recovery', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  describe('Task 1: AC-2.4.1 – Specific error message for missing Mermaid block', () => {
+    it('should display specific error message when parseMarkdown throws "No mermaid code block found"', async () => {
+      mockedParseMarkdown.mockImplementation(() => {
+        throw new Error('No mermaid code block found in markdown')
+      })
+
+      renderToolbar()
+
+      const input = document.querySelector('input[type="file"]') as HTMLInputElement
+      const file = createMockFile('no-diagram.md', '# Title\n\nJust text')
+
+      fireEvent.change(input, { target: { files: [file] } })
+
+      await waitFor(() => {
+        expect(screen.getByText(/No Mermaid diagram found in this file/)).toBeInTheDocument()
+        expect(screen.getByText(/Please select a file with a mermaid code block/)).toBeInTheDocument()
+      })
+    })
+
+    it('should use role="alert" for error message display', async () => {
+      mockedParseMarkdown.mockImplementation(() => {
+        throw new Error('No mermaid code block found in markdown')
+      })
+
+      renderToolbar()
+
+      const input = document.querySelector('input[type="file"]') as HTMLInputElement
+      const file = createMockFile('empty.md', '# Empty')
+
+      fireEvent.change(input, { target: { files: [file] } })
+
+      await waitFor(() => {
+        const alertEl = screen.getByRole('alert')
+        expect(alertEl).toBeInTheDocument()
+        expect(alertEl).toHaveTextContent('No Mermaid diagram found in this file')
+      })
+    })
+
+    it('should display error in red text with "Error:" prefix', async () => {
+      mockedParseMarkdown.mockImplementation(() => {
+        throw new Error('No mermaid code block found in markdown')
+      })
+
+      renderToolbar()
+
+      const input = document.querySelector('input[type="file"]') as HTMLInputElement
+      const file = createMockFile('bad.md', '# No mermaid')
+
+      fireEvent.change(input, { target: { files: [file] } })
+
+      await waitFor(() => {
+        expect(screen.getByText('Error:')).toBeInTheDocument()
+        const errorPrefix = screen.getByText('Error:')
+        expect(errorPrefix).toHaveClass('text-red-500')
+      })
+    })
+  })
+
+  describe('Task 2: AC-2.4.3 & AC-2.4.4 – Open Different File recovery button', () => {
+    it('should display "Open Different File" button when error exists', async () => {
+      mockedParseMarkdown.mockImplementation(() => {
+        throw new Error('No mermaid code block found in markdown')
+      })
+
+      renderToolbar()
+
+      const input = document.querySelector('input[type="file"]') as HTMLInputElement
+      const file = createMockFile('invalid.md', '# No diagram')
+
+      fireEvent.change(input, { target: { files: [file] } })
+
+      await waitFor(() => {
+        const recoveryButton = screen.getByRole('button', { name: /open a different file/i })
+        expect(recoveryButton).toBeInTheDocument()
+      })
+    })
+
+    it('should not display recovery button when no error exists', () => {
+      mockedParseMarkdown.mockReturnValue('flowchart TD\n  A-->B')
+
+      renderToolbar()
+
+      expect(screen.queryByRole('button', { name: /open a different file/i })).not.toBeInTheDocument()
+    })
+
+    it('should dispatch RESET_FILE when recovery button is clicked', async () => {
+      mockedParseMarkdown.mockImplementation(() => {
+        throw new Error('No mermaid code block found in markdown')
+      })
+
+      renderToolbar()
+
+      const input = document.querySelector('input[type="file"]') as HTMLInputElement
+      const file = createMockFile('invalid.md', '# No diagram')
+
+      // First, trigger an error
+      fireEvent.change(input, { target: { files: [file] } })
+
+      await waitFor(() => {
+        expect(screen.getByRole('alert')).toBeInTheDocument()
+      })
+
+      // Click recovery button
+      const recoveryButton = screen.getByRole('button', { name: /open a different file/i })
+      fireEvent.click(recoveryButton)
+
+      // After reset, error should be gone and file name should be cleared
+      await waitFor(() => {
+        expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+        expect(screen.queryByText('Error:')).not.toBeInTheDocument()
+      })
+    })
+
+    it('should clear fileName when recovery button is clicked', async () => {
+      mockedParseMarkdown.mockImplementation(() => {
+        throw new Error('No mermaid code block found in markdown')
+      })
+
+      renderToolbar()
+
+      const input = document.querySelector('input[type="file"]') as HTMLInputElement
+      const file = createMockFile('invalid.md', '# No diagram')
+
+      fireEvent.change(input, { target: { files: [file] } })
+
+      // File name should display even on error
+      await waitFor(() => {
+        expect(screen.getByText('invalid.md')).toBeInTheDocument()
+      })
+
+      // Click recovery button
+      const recoveryButton = screen.getByRole('button', { name: /open a different file/i })
+      fireEvent.click(recoveryButton)
+
+      // File name should be cleared after reset
+      await waitFor(() => {
+        expect(screen.queryByText('invalid.md')).not.toBeInTheDocument()
+      })
+    })
+
+    it('should open file picker after recovery button click', async () => {
+      mockedParseMarkdown.mockImplementation(() => {
+        throw new Error('No mermaid code block found in markdown')
+      })
+
+      renderToolbar()
+
+      const input = document.querySelector('input[type="file"]') as HTMLInputElement
+      const file = createMockFile('bad.md', '# No diagram')
+
+      fireEvent.change(input, { target: { files: [file] } })
+
+      await waitFor(() => {
+        expect(screen.getByRole('alert')).toBeInTheDocument()
+      })
+
+      // Mock the click method on file input
+      const clickSpy = vi.spyOn(input, 'click')
+
+      // Click recovery button
+      const recoveryButton = screen.getByRole('button', { name: /open a different file/i })
+      fireEvent.click(recoveryButton)
+
+      // File picker should be triggered
+      expect(clickSpy).toHaveBeenCalled()
+    })
+  })
+
+  describe('Task 3: AC-2.4.5 & AC-2.4.6 – Accessibility and styling', () => {
+    it('should have aria-label on recovery button', async () => {
+      mockedParseMarkdown.mockImplementation(() => {
+        throw new Error('No mermaid code block found in markdown')
+      })
+
+      renderToolbar()
+
+      const input = document.querySelector('input[type="file"]') as HTMLInputElement
+      const file = createMockFile('bad.md', '# No diagram')
+
+      fireEvent.change(input, { target: { files: [file] } })
+
+      await waitFor(() => {
+        const recoveryButton = screen.getByRole('button', { name: /open a different file/i })
+        expect(recoveryButton).toHaveAttribute('aria-label', 'Open a different file')
+      })
+    })
+
+    it('should style recovery button distinctly from main Open File button', async () => {
+      mockedParseMarkdown.mockImplementation(() => {
+        throw new Error('No mermaid code block found in markdown')
+      })
+
+      renderToolbar()
+
+      const input = document.querySelector('input[type="file"]') as HTMLInputElement
+      const file = createMockFile('bad.md', '# No diagram')
+
+      fireEvent.change(input, { target: { files: [file] } })
+
+      await waitFor(() => {
+        const openFileButton = screen.getByRole('button', { name: /open markdown file/i })
+        const recoveryButton = screen.getByRole('button', { name: /open a different file/i })
+
+        // Main button should be blue
+        expect(openFileButton).toHaveClass('bg-blue-600')
+        
+        // Recovery button should be gray (secondary style)
+        expect(recoveryButton).toHaveClass('bg-gray-600')
+      })
+    })
+
+    it('should have visible focus indicator on recovery button', async () => {
+      mockedParseMarkdown.mockImplementation(() => {
+        throw new Error('No mermaid code block found in markdown')
+      })
+
+      renderToolbar()
+
+      const input = document.querySelector('input[type="file"]') as HTMLInputElement
+      const file = createMockFile('bad.md', '# No diagram')
+
+      fireEvent.change(input, { target: { files: [file] } })
+
+      await waitFor(() => {
+        const recoveryButton = screen.getByRole('button', { name: /open a different file/i })
+        // Should have focus-visible or similar outline class for keyboard navigation
+        expect(recoveryButton.className).toMatch(/focus|outline/)
+      })
+    })
+  })
+
+  describe('Task 4: AC-2.4.7 – Error state persistence', () => {
+    it('should persist error message until user opens new file', async () => {
+      mockedParseMarkdown.mockImplementation(() => {
+        throw new Error('No mermaid code block found in markdown')
+      })
+
+      renderToolbar()
+
+      const input = document.querySelector('input[type="file"]') as HTMLInputElement
+      const file = createMockFile('bad.md', '# No diagram')
+
+      fireEvent.change(input, { target: { files: [file] } })
+
+      await waitFor(() => {
+        expect(screen.getByRole('alert')).toBeInTheDocument()
+      })
+
+      // Error should still be there after a short wait
+      await new Promise(resolve => setTimeout(resolve, 500))
+      expect(screen.getByRole('alert')).toBeInTheDocument()
+    })
+
+    it('should clear error when new valid file is loaded', async () => {
+      mockedParseMarkdown.mockImplementation(() => {
+        throw new Error('No mermaid code block found in markdown')
+      })
+
+      renderToolbar()
+
+      const input = document.querySelector('input[type="file"]') as HTMLInputElement
+      const badFile = createMockFile('bad.md', '# No diagram')
+
+      // Load invalid file
+      fireEvent.change(input, { target: { files: [badFile] } })
+
+      await waitFor(() => {
+        expect(screen.getByRole('alert')).toBeInTheDocument()
+      })
+
+      // Now load valid file
+      mockedParseMarkdown.mockImplementation(() => {
+        return 'flowchart TD\n  A-->B'
+      })
+
+      const goodFile = createMockFile('good.md', '```mermaid\nflowchart TD\n  A-->B\n```')
+      fireEvent.change(input, { target: { files: [goodFile] } })
+
+      // Error should be cleared
+      await waitFor(() => {
+        expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+      })
+    })
+  })
+
+  describe('Task 4: AC-2.4.8 – Graceful error handling', () => {
+    it('should handle invalid markdown gracefully without crashing', async () => {
+      mockedParseMarkdown.mockImplementation(() => {
+        throw new Error('Invalid markdown input')
+      })
+
+      renderToolbar()
+
+      const input = document.querySelector('input[type="file"]') as HTMLInputElement
+      const file = createMockFile('invalid.md', '')
+
+      expect(() => {
+        fireEvent.change(input, { target: { files: [file] } })
+      }).not.toThrow()
+    })
+
+    it('should handle non-Error exceptions gracefully', async () => {
+      mockedParseMarkdown.mockImplementation(() => {
+        throw 'String exception'
+      })
+
+      renderToolbar()
+
+      const input = document.querySelector('input[type="file"]') as HTMLInputElement
+      const file = createMockFile('crash.md', 'test')
+
+      fireEvent.change(input, { target: { files: [file] } })
+
+      // Should not crash, should show some error
+      await waitFor(() => {
+        expect(screen.getByRole('alert')).toBeInTheDocument()
+      })
     })
   })
 })

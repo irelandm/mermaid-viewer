@@ -1,0 +1,10 @@
+flowchart TD
+    S([User clicks "Submit"]) --> V{Are all required fields filled in?}
+    V -- Yes, continue --> L[Log request payload]
+    V -- No, show inline validation errors --> E[Display error summary]
+    L --> R{Rate limit exceeded?}
+    R -- Yes (HTTP 429) --> T[Throttle response]
+    R -- No --> H[Send to backend handler]
+    H --> K[Return success JSON response]
+    T --> K
+

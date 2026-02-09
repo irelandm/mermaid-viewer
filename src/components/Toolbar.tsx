@@ -46,8 +46,15 @@ export function Toolbar() {
         },
       })
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to read file'
+      let errorMessage: string
+
+      // Check if it's a parseMarkdown error (no mermaid block found)
+      if (error instanceof Error && error.message.includes('No mermaid code block found')) {
+        errorMessage = 'No Mermaid diagram found in this file. Please select a file with a mermaid code block.'
+      } else {
+        errorMessage = error instanceof Error ? error.message : 'Failed to read file'
+      }
+
       dispatch({
         type: 'SET_STATUS',
         payload: {
@@ -64,16 +71,32 @@ export function Toolbar() {
     event.target.value = ''
   }
 
+  const handleOpenDifferentFile = () => {
+    dispatch({ type: 'RESET_FILE' })
+    // Trigger file picker after reset
+    fileInputRef.current?.click()
+  }
+
   return (
     <div className="flex items-center gap-2 p-4 bg-gray-900 border-b border-gray-800">
       <button
         onClick={handleOpenFile}
         disabled={state.isLoading}
-        className="flex-shrink-0 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded font-medium transition-colors"
+        className="flex-shrink-0 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded font-medium transition-colors focus:outline-2 focus:outline-cyan-400"
         aria-label="Open Markdown file"
       >
         Open File
       </button>
+
+      {state.error && (
+        <button
+          onClick={handleOpenDifferentFile}
+          className="flex-shrink-0 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded font-medium transition-colors focus:outline-2 focus:outline-cyan-400"
+          aria-label="Open a different file"
+        >
+          Open Different File
+        </button>
+      )}
 
       <input
         ref={fileInputRef}
