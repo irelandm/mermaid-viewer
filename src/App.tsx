@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import { Status } from './components/Status'
 
-function App() {
+function AppContent() {
   const [count, setCount] = useState(0)
 
   useEffect(() => {
@@ -13,6 +14,7 @@ function App() {
 
   return (
     <>
+      <Status />
       <div>
         <a href="https://vite.dev" target="_blank">
           <img src={viteLogo} className="logo" alt="Vite logo" />
@@ -37,4 +39,4 @@ function App() {
   )
 }
 
-export default App
+export default AppContent

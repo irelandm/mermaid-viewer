@@ -1,4 +1,5 @@
 import React, { createContext, useReducer, type ReactNode } from 'react'
+import type { StatusMessage } from '../types'
 
 // App State Types
 export interface AppState {
@@ -10,6 +11,7 @@ export interface AppState {
   isLoading: boolean
   selectedNodeId: string | null
   searchQuery: string
+  status: StatusMessage | null
 }
 
 // Action Types
@@ -22,6 +24,7 @@ export type AppAction =
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_SELECTED_NODE'; payload: string | null }
   | { type: 'SET_SEARCH_QUERY'; payload: string }
+  | { type: 'SET_STATUS'; payload: StatusMessage | null }
   | { type: 'RESET_FILE' }
 
 // Initial State
@@ -34,6 +37,7 @@ const initialState: AppState = {
   isLoading: false,
   selectedNodeId: null,
   searchQuery: '',
+  status: null,
 }
 
 // Reducer
@@ -55,6 +59,8 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return { ...state, selectedNodeId: action.payload }
     case 'SET_SEARCH_QUERY':
       return { ...state, searchQuery: action.payload }
+    case 'SET_STATUS':
+      return { ...state, status: action.payload }
     case 'RESET_FILE':
       return {
         ...state,
