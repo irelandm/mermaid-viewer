@@ -82,8 +82,8 @@ flowchart TD
   })
 
   it('should throw error on null/undefined input', () => {
-    expect(() => parseMarkdown(null as any)).toThrow('Invalid markdown input')
-    expect(() => parseMarkdown(undefined as any)).toThrow('Invalid markdown input')
+    expect(() => parseMarkdown(null as unknown as string)).toThrow('Invalid markdown input')
+    expect(() => parseMarkdown(undefined as unknown as string)).toThrow('Invalid markdown input')
   })
 
   it('should handle complex flowchart syntax', () => {

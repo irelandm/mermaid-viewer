@@ -14,6 +14,9 @@ export function Toolbar() {
     const file = event.target.files?.[0]
     if (!file) return
 
+    // Guard against race condition: prevent multiple simultaneous loads
+    if (state.isLoading) return
+
     // Validate file extension
     if (!file.name.endsWith('.md')) {
       dispatch({

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { Status } from '../Status'
-import { AppProvider } from '../../context/AppContext'
+import { AppProvider } from '../../context/AppProvider'
 
 describe('Status Component', () => {
   beforeEach(() => {

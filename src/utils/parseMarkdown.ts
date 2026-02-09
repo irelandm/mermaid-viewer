@@ -2,6 +2,16 @@ import { unified } from 'unified'
 import remarkParse from 'remark-parse'
 
 /**
+ * AST Node type for remark parsed markdown
+ */
+interface ASTNode {
+  type: string
+  lang?: string
+  value?: string
+  children?: ASTNode[]
+}
+
+/**
  * Extracts the first Mermaid code block from a Markdown document.
  * 
  * @param markdown - The Markdown document content
@@ -26,12 +36,12 @@ export function parseMarkdown(markdown: string): string {
   }
 
   const processor = unified().use(remarkParse)
-  const ast = processor.parse(markdown)
+  const ast = processor.parse(markdown) as ASTNode
 
   // Walk through the AST to find the first code block with language 'mermaid'
   let mermaidCode: string | null = null
 
-  function visit(node: any): void {
+  function visit(node: ASTNode): void {
     // Stop if we've already found the mermaid block
     if (mermaidCode !== null) {
       return

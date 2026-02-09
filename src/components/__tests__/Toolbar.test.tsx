@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { Toolbar } from '../Toolbar'
-import { AppProvider } from '../../context/AppContext'
+import { AppProvider } from '../../context/AppProvider'
 import * as parseMarkdownModule from '../../utils/parseMarkdown'
 
 // Mock parseMarkdown
@@ -235,6 +235,39 @@ describe('Toolbar – Story 2.3: Display Loaded File Name & Status', () => {
 
       expect(screen.queryByText('File:')).not.toBeInTheDocument()
       expect(screen.queryByText('Error:')).not.toBeInTheDocument()
+    })
+
+    it('should allow re-selecting the same file after first selection', async () => {
+      mockedParseMarkdown.mockReturnValue('flowchart TD\n  A-->B')
+
+      renderToolbar()
+
+      const input = document.querySelector('input[type="file"]') as HTMLInputElement
+      const file = createMockFile('test.md', '```mermaid\nflowchart TD\n  A-->B\n```')
+
+      // First selection
+      fireEvent.change(input, { target: { files: [file] } })
+
+      await waitFor(() => {
+        expect(screen.getByText('test.md')).toBeInTheDocument()
+      })
+
+      // Reset input value to allow re-selection of same file
+      // (Toolbar.tsx handles this with: event.target.value = '')
+      input.value = ''
+
+      // Clear parseMarkdown mock to ensure it's called again
+      vi.clearAllMocks()
+      mockedParseMarkdown.mockReturnValue('flowchart TD\n  A-->B')
+
+      // Second selection of same file should work
+      fireEvent.change(input, { target: { files: [file] } })
+
+      await waitFor(() => {
+        // Verify parseMarkdown was called (indicating file was processed)
+        expect(mockedParseMarkdown).toHaveBeenCalled()
+        expect(screen.getByText('test.md')).toBeInTheDocument()
+      })
     })
   })
 })
