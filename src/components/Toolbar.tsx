@@ -63,7 +63,7 @@ export function Toolbar() {
       <button
         onClick={handleOpenFile}
         disabled={state.isLoading}
-        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded font-medium transition-colors"
+        className="flex-shrink-0 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:cursor-not-allowed text-white rounded font-medium transition-colors"
         aria-label="Open Markdown file"
       >
         Open File
@@ -79,8 +79,8 @@ export function Toolbar() {
       />
 
       {state.fileName && (
-        <div className="flex-1 text-sm text-gray-300">
-          <span className="text-gray-400">File:</span> {state.fileName}
+        <div className="flex-1 min-w-0 text-sm text-gray-300">
+          <span className="text-gray-400">File:</span> <span className="truncate">{state.fileName}</span>
         </div>
       )}
     </div>

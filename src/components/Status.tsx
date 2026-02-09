@@ -50,12 +50,10 @@ export function Status() {
       aria-live={ariaLive}
       aria-label={`${status.type} message: ${status.message}`}
       className={`
-        fixed top-4 left-4 right-4 z-50
-        border-l-4 px-4 py-3 rounded
+        mx-4 mt-2 border-l-4 px-4 py-3 rounded
         ${bgColorMap[status.type]}
         ${textColorMap[status.type]}
         flex items-center justify-between gap-3
-        max-w-2xl
       `}
     >
       <div className="flex items-center gap-3 flex-1">

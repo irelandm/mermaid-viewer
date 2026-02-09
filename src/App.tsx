@@ -10,8 +10,8 @@ function AppContent() {
 
   return (
     <>
-      <Status />
       <Toolbar />
+      <Status />
       <main className="flex-1 flex flex-col items-center justify-center p-8">
         <h1 className="text-3xl font-bold text-gray-100 mb-4">
           Mermaid Viewer

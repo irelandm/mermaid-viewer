@@ -8,12 +8,16 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest",
+    "test": "vitest --run",
     "test:ui": "vitest --ui"
   },
   "dependencies": {
+    "mermaid": "^11.12.2",
+    "panzoom": "^9.4.3",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "remark": "^15.0.1",
+    "remark-parse": "^11.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
