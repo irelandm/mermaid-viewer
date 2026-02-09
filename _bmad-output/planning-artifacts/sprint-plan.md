@@ -30,7 +30,7 @@ Single-developer kanban workflow executing 37 MVP stories across 7 epics in sequ
 | 1.3 | Configure Tailwind CSS with Dark Mode | 1.2 | Tailwind utilities working, dark mode default, color tokens defined | Done |
 | 1.4 | Set Up React Context & State Management | 1.3 | AppContext provider wrapping app, useAppState hook exportable | Done |
 | 1.5 | Create Project Directory Structure | 1.4 | Folder structure created, .gitignore in place | Done |
-| 1.6 | Create Temporary File Load Status Display | 1.5 | Status component renders success/error messages, integrated with AppContext | To Do |
+| 1.6 | Create Temporary File Load Status Display | 1.5 | Status component renders success/error messages, integrated with AppContext | Done |
 
 **Completion Gate:** Run `npm run dev` and confirm:
 - Dev server starts without errors
@@ -51,7 +51,7 @@ Single-developer kanban workflow executing 37 MVP stories across 7 epics in sequ
 
 | # | Story | Prerequisite | Exit Criteria | Status |
 |---|-------|--------------|---------------|--------|
-| 2.1 | Create File Open Button & File Picker | 1.6 | Button appears in toolbar, file picker filters `.md` files | To Do |
+| 2.1 | Create File Open Button & File Picker | 1.6 | Button appears in toolbar, file picker filters `.md` files | Done |
 | 2.2 | Parse Markdown & Extract Mermaid Code Block | 2.1 | Remark parser identifies first `mermaid` code block, error on missing block | To Do |
 | 2.3 | Display Loaded File Name & Status | 2.2 | File name displays in toolbar, status message shows "Loaded: [filename]" | To Do |
 | 2.4 | Handle File Parse Errors & Provide Recovery | 2.3 | Error messages display inline, recovery action ("Open Different File") works | To Do |
