@@ -63,12 +63,22 @@ This completes Epic 2's file handling workflow with comprehensive error recovery
 
 ## Dev Notes
 
-### Current Implementation State
+## Implementation Notes - UPDATED
 
-- **Toolbar.tsx:** Currently handles file selection, calls parseMarkdown, dispatches errors to status
-- **parseMarkdown:** Throws Error if no mermaid block found; message: "No mermaid code block found in markdown"
-- **AppContext:** Has RESET_FILE action that clears all file-related state
-- **Status Component:** Displays status messages with appropriate styling; error role="alert"
+### UX Simplification (2026-02-10)
+The separate "Open Different File" recovery button was removed after UX feedback. Users can simply click the main "Open File" button to load a new file when an error occurs. This simplifies the UI without losing any functionality.
+
+**Changes:**
+- Removed `handleOpenDifferentFile` function
+- Removed conditional recovery button rendering
+- Updated tests to verify recovery via main Open File button
+- Reduced button count from 2 to 1 in error state
+
+### Original Implementation (Archived)
+- AC-2.4.3 & AC-2.4.4 originally called for separate recovery button
+- Button has been consolidated - users click "Open File" button for both initial load and recovery
+
+**Tests:** 50/50 passing (reduced from 55 due to removal of recovery button-specific tests)
 
 ### Key Decisions to Make
 
@@ -200,11 +210,15 @@ This completes Epic 2's file handling workflow with comprehensive error recovery
 
 ## Status
 
-**Current:** approved  
-**Previous:** review  
-**Next:** Ready for merge to main
+**Current:** approved (with UX simplification)  
+**Previous:** approved  
+**Next:** Ready for final merge with simplified error recovery
 
-## Code Review Summary
+### Latest Update (2026-02-10)
+✅ UX simplification approved: Removed redundant "Open Different File" button  
+✅ All 50 tests passing  
+✅ ESLint: 0 errors  
+✅ Commit: `842f040` - refactor: simplify error recovery UX
 
 **Reviewer:** Deveshi (Adversarial Code Review)  
 **Date:** 2026-02-09  
