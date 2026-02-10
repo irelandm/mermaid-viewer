@@ -65,7 +65,6 @@ export function Toolbar() {
           message: errorMessage,
         },
       })
-      dispatch({ type: 'SET_ERROR', payload: errorMessage })
     } finally {
       dispatch({ type: 'SET_LOADING', payload: false })
     }
@@ -93,18 +92,6 @@ export function Toolbar() {
         className="hidden"
         aria-hidden="true"
       />
-
-      {state.error && state.fileName ? (
-        <div className="flex-1 min-w-0 text-sm text-red-400" role="alert">
-          <span className="text-red-500">Error:</span>{' '}
-          <span className="truncate">{state.error}</span>
-        </div>
-      ) : state.fileName ? (
-        <div className="flex-1 min-w-0 text-sm text-gray-300">
-          <span className="text-gray-400">File:</span>{' '}
-          <span className="truncate">{state.fileName}</span>
-        </div>
-      ) : null}
     </div>
   )
 }

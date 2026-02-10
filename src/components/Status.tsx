@@ -57,9 +57,6 @@ export function Status() {
       `}
     >
       <div className="flex items-center gap-3 flex-1">
-        <span className="text-lg font-bold" aria-hidden="true">
-          {iconMap[status.type]}
-        </span>
         <span className="text-sm">{status.message}</span>
       </div>
       <button
