@@ -34,13 +34,6 @@ export function Status() {
     info: 'text-blue-100',
   }
 
-  const iconMap = {
-    success: '✓',
-    error: '✕',
-    warning: '⚠',
-    info: 'ℹ',
-  }
-
   const role = status.type === 'error' ? 'alert' : 'status'
   const ariaLive = status.type === 'error' ? 'assertive' : 'polite'
 
