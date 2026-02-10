@@ -54,7 +54,7 @@ Single-developer kanban workflow executing 37 MVP stories across 7 epics in sequ
 | 2.1 | Create File Open Button & File Picker | 1.6 | Button appears in toolbar, file picker filters `.md` files | Done |
 | 2.2 | Parse Markdown & Extract Mermaid Code Block | 2.1 | Remark parser identifies first `mermaid` code block, error on missing block | Done |
 | 2.3 | Display Loaded File Name & Status | 2.2 | File name displays in toolbar, status message shows "Loaded: [filename]" | Done |
-| 2.4 | Handle File Parse Errors & Provide Recovery | 2.3 | Error messages display inline, recovery action ("Open Different File") works | To Do |
+| 2.4 | Handle File Parse Errors & Provide Recovery | 2.3 | Error messages display inline, recovery action ("Open Different File") works | Done |
 
 **Completion Gate:** 
 - Load a valid Markdown file with Mermaid block → file name displays, status shows success

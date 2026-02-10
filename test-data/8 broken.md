@@ -1,6 +1,6 @@
 ```mermaid
-flowchart TD
-    S([User clicks "Submit"]) --> V{Are all required fields filled in?}
+flow chart TD
+    S([User clicks "Submit"])  V{Are all required fields filled in?}
     V -- Yes, continue --> L[Log request payload]
     V -- No, show inline validation errors --> E[Display error summary]
     L --> R{Rate limit exceeded?}

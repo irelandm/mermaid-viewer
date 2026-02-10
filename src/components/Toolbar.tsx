@@ -74,12 +74,6 @@ export function Toolbar() {
     event.target.value = ''
   }
 
-  const handleOpenDifferentFile = () => {
-    dispatch({ type: 'RESET_FILE' })
-    // Trigger file picker after reset
-    fileInputRef.current?.click()
-  }
-
   return (
     <div className="flex items-center gap-2 p-4 bg-gray-900 border-b border-gray-800">
       <button
@@ -90,16 +84,6 @@ export function Toolbar() {
       >
         Open File
       </button>
-
-      {state.error && (
-        <button
-          onClick={handleOpenDifferentFile}
-          className="flex-shrink-0 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded font-medium transition-colors focus:outline-2 focus:outline-cyan-400"
-          aria-label="Open a different file"
-        >
-          Open Different File
-        </button>
-      )}
 
       <input
         ref={fileInputRef}

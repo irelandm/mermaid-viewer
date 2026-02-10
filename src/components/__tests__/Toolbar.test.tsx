@@ -335,8 +335,9 @@ describe('Toolbar – Story 2.4: Handle File Parse Errors & Provide Recovery', (
     })
   })
 
-  describe('Task 2: AC-2.4.3 & AC-2.4.4 – Open Different File recovery button', () => {
-    it('should display "Open Different File" button when error exists', async () => {
+  describe('Task 2 & 3: Error recovery using Open File button', () => {
+    it('should allow opening a new file after error using the Open File button', async () => {
+      // First mock: invalid file
       mockedParseMarkdown.mockImplementation(() => {
         throw new Error('No mermaid code block found in markdown')
       })
@@ -344,167 +345,53 @@ describe('Toolbar – Story 2.4: Handle File Parse Errors & Provide Recovery', (
       renderToolbar()
 
       const input = document.querySelector('input[type="file"]') as HTMLInputElement
-      const file = createMockFile('invalid.md', '# No diagram')
 
-      fireEvent.change(input, { target: { files: [file] } })
+      // Load invalid file
+      const invalidFile = createMockFile('invalid.md', '# No mermaid')
+      fireEvent.change(input, { target: { files: [invalidFile] } })
 
       await waitFor(() => {
-        const recoveryButton = screen.getByRole('button', { name: /open a different file/i })
-        expect(recoveryButton).toBeInTheDocument()
+        expect(screen.getByRole('alert')).toBeInTheDocument()
+        expect(screen.getByText(/No Mermaid diagram found/)).toBeInTheDocument()
+      })
+
+      // Now switch to valid file using the same Open File button
+      // Update the mock to return valid mermaid code
+      mockedParseMarkdown.mockReturnValue('flowchart TD\n  A-->B')
+
+      const validFile = createMockFile('valid.md', '```mermaid\nflowchart TD\n  A-->B\n```')
+      fireEvent.change(input, { target: { files: [validFile] } })
+
+      // Error should be cleared, new file should display with its name
+      await waitFor(() => {
+        expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+        expect(screen.getByText('File:')).toBeInTheDocument()
+        expect(screen.getByText('valid.md')).toBeInTheDocument()
       })
     })
 
-    it('should not display recovery button when no error exists', () => {
+    it('should have sufficient contrast and visible focus on Open File button', () => {
+      mockedParseMarkdown.mockReturnValue('flowchart TD\n  A-->B')
+
+      renderToolbar()
+
+      const button = screen.getByRole('button', { name: /open markdown file/i })
+      
+      // Should have focus outline class
+      expect(button.className).toMatch(/focus|outline/)
+      
+      // Should have blue background (primary style)
+      expect(button).toHaveClass('bg-blue-600')
+    })
+  })
+
+  describe('Task 3: AC-2.4.5 & AC-2.4.6 – Accessibility and styling (deprecated - Open Different File button removed)', () => {
+    it('should not display separate recovery button (simplified UX)', () => {
       mockedParseMarkdown.mockReturnValue('flowchart TD\n  A-->B')
 
       renderToolbar()
 
       expect(screen.queryByRole('button', { name: /open a different file/i })).not.toBeInTheDocument()
-    })
-
-    it('should dispatch RESET_FILE when recovery button is clicked', async () => {
-      mockedParseMarkdown.mockImplementation(() => {
-        throw new Error('No mermaid code block found in markdown')
-      })
-
-      renderToolbar()
-
-      const input = document.querySelector('input[type="file"]') as HTMLInputElement
-      const file = createMockFile('invalid.md', '# No diagram')
-
-      // First, trigger an error
-      fireEvent.change(input, { target: { files: [file] } })
-
-      await waitFor(() => {
-        expect(screen.getByRole('alert')).toBeInTheDocument()
-      })
-
-      // Click recovery button
-      const recoveryButton = screen.getByRole('button', { name: /open a different file/i })
-      fireEvent.click(recoveryButton)
-
-      // After reset, error should be gone and file name should be cleared
-      await waitFor(() => {
-        expect(screen.queryByRole('alert')).not.toBeInTheDocument()
-        expect(screen.queryByText('Error:')).not.toBeInTheDocument()
-      })
-    })
-
-    it('should clear fileName when recovery button is clicked', async () => {
-      mockedParseMarkdown.mockImplementation(() => {
-        throw new Error('No mermaid code block found in markdown')
-      })
-
-      renderToolbar()
-
-      const input = document.querySelector('input[type="file"]') as HTMLInputElement
-      const file = createMockFile('invalid.md', '# No diagram')
-
-      fireEvent.change(input, { target: { files: [file] } })
-
-      // File name should display even on error
-      await waitFor(() => {
-        expect(screen.getByText('invalid.md')).toBeInTheDocument()
-      })
-
-      // Click recovery button
-      const recoveryButton = screen.getByRole('button', { name: /open a different file/i })
-      fireEvent.click(recoveryButton)
-
-      // File name should be cleared after reset
-      await waitFor(() => {
-        expect(screen.queryByText('invalid.md')).not.toBeInTheDocument()
-      })
-    })
-
-    it('should open file picker after recovery button click', async () => {
-      mockedParseMarkdown.mockImplementation(() => {
-        throw new Error('No mermaid code block found in markdown')
-      })
-
-      renderToolbar()
-
-      const input = document.querySelector('input[type="file"]') as HTMLInputElement
-      const file = createMockFile('bad.md', '# No diagram')
-
-      fireEvent.change(input, { target: { files: [file] } })
-
-      await waitFor(() => {
-        expect(screen.getByRole('alert')).toBeInTheDocument()
-      })
-
-      // Mock the click method on file input
-      const clickSpy = vi.spyOn(input, 'click')
-
-      // Click recovery button
-      const recoveryButton = screen.getByRole('button', { name: /open a different file/i })
-      fireEvent.click(recoveryButton)
-
-      // File picker should be triggered
-      expect(clickSpy).toHaveBeenCalled()
-    })
-  })
-
-  describe('Task 3: AC-2.4.5 & AC-2.4.6 – Accessibility and styling', () => {
-    it('should have aria-label on recovery button', async () => {
-      mockedParseMarkdown.mockImplementation(() => {
-        throw new Error('No mermaid code block found in markdown')
-      })
-
-      renderToolbar()
-
-      const input = document.querySelector('input[type="file"]') as HTMLInputElement
-      const file = createMockFile('bad.md', '# No diagram')
-
-      fireEvent.change(input, { target: { files: [file] } })
-
-      await waitFor(() => {
-        const recoveryButton = screen.getByRole('button', { name: /open a different file/i })
-        expect(recoveryButton).toHaveAttribute('aria-label', 'Open a different file')
-      })
-    })
-
-    it('should style recovery button distinctly from main Open File button', async () => {
-      mockedParseMarkdown.mockImplementation(() => {
-        throw new Error('No mermaid code block found in markdown')
-      })
-
-      renderToolbar()
-
-      const input = document.querySelector('input[type="file"]') as HTMLInputElement
-      const file = createMockFile('bad.md', '# No diagram')
-
-      fireEvent.change(input, { target: { files: [file] } })
-
-      await waitFor(() => {
-        const openFileButton = screen.getByRole('button', { name: /open markdown file/i })
-        const recoveryButton = screen.getByRole('button', { name: /open a different file/i })
-
-        // Main button should be blue
-        expect(openFileButton).toHaveClass('bg-blue-600')
-        
-        // Recovery button should be gray (secondary style)
-        expect(recoveryButton).toHaveClass('bg-gray-600')
-      })
-    })
-
-    it('should have visible focus indicator on recovery button', async () => {
-      mockedParseMarkdown.mockImplementation(() => {
-        throw new Error('No mermaid code block found in markdown')
-      })
-
-      renderToolbar()
-
-      const input = document.querySelector('input[type="file"]') as HTMLInputElement
-      const file = createMockFile('bad.md', '# No diagram')
-
-      fireEvent.change(input, { target: { files: [file] } })
-
-      await waitFor(() => {
-        const recoveryButton = screen.getByRole('button', { name: /open a different file/i })
-        // Should have focus-visible or similar outline class for keyboard navigation
-        expect(recoveryButton.className).toMatch(/focus|outline/)
-      })
     })
   })
 
