@@ -32,6 +32,12 @@ function appReducer(state: AppState, action: AppAction): AppState {
         selectedNodeId: null,
         searchQuery: '',
       }
+    case 'SET_ZOOM':
+      return { ...state, zoomLevel: action.payload }
+    case 'SET_PAN':
+      return { ...state, panX: action.payload.x, panY: action.payload.y }
+    case 'RESET_ZOOM_PAN':
+      return { ...state, zoomLevel: 1, panX: 0, panY: 0 }
     default:
       return state
   }
@@ -47,6 +53,9 @@ const initialState: AppState = {
   selectedNodeId: null,
   searchQuery: '',
   status: null,
+  zoomLevel: 1,
+  panX: 0,
+  panY: 0,
 }
 
 describe('AppContext Status State', () => {
@@ -167,6 +176,9 @@ describe('AppContext Status State', () => {
       expect(initialState).toHaveProperty('selectedNodeId', null)
       expect(initialState).toHaveProperty('searchQuery', '')
       expect(initialState).toHaveProperty('status', null)
+      expect(initialState).toHaveProperty('zoomLevel', 1)
+      expect(initialState).toHaveProperty('panX', 0)
+      expect(initialState).toHaveProperty('panY', 0)
     })
   })
 })

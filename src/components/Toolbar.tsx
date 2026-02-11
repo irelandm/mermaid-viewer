@@ -92,6 +92,22 @@ export function Toolbar() {
         className="hidden"
         aria-hidden="true"
       />
+
+      {/* Error display */}
+      {state.status?.type === 'error' && (
+        <div role="alert" className="flex items-center gap-1 text-sm min-w-0">
+          <span className="text-red-500 font-medium flex-shrink-0">Error:</span>
+          <span className="text-red-300 truncate">{state.status.message}</span>
+        </div>
+      )}
+
+      {/* File name display (only when no error) */}
+      {state.fileName && state.status?.type !== 'error' && (
+        <div className="flex items-center gap-1 text-sm min-w-0">
+          <span className="text-gray-400 flex-shrink-0">File:</span>
+          <span className="text-white truncate">{state.fileName}</span>
+        </div>
+      )}
     </div>
   )
 }

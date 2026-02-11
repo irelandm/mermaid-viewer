@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import mermaid from 'mermaid'
 import { useAppState } from '../context/useAppState'
 import { LoadingSpinner } from './LoadingSpinner'
+import { usePanzoom } from '../hooks/usePanzoom'
 
 /**
  * SVGCanvas component renders Mermaid diagrams to SVG and auto-fits to viewport
@@ -18,6 +19,9 @@ export function SVGCanvas() {
   const containerRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
   const { state, dispatch } = useAppState()
+  
+  // Initialize panzoom hook (Epic 4)
+  const { resetView: _resetView } = usePanzoom(svgRef)
 
   useEffect(() => {
     // Initialize mermaid library once on component mount

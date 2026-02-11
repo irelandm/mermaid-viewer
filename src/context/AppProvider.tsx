@@ -12,6 +12,10 @@ const initialState: AppState = {
   selectedNodeId: null,
   searchQuery: '',
   status: null,
+  // Zoom/Pan initial state (Epic 4)
+  zoomLevel: 1,
+  panX: 0,
+  panY: 0,
 }
 
 // Reducer
@@ -45,6 +49,12 @@ function appReducer(state: AppState, action: AppAction): AppState {
         selectedNodeId: null,
         searchQuery: '',
       }
+    case 'SET_ZOOM':
+      return { ...state, zoomLevel: action.payload }
+    case 'SET_PAN':
+      return { ...state, panX: action.payload.x, panY: action.payload.y }
+    case 'RESET_ZOOM_PAN':
+      return { ...state, zoomLevel: 1, panX: 0, panY: 0 }
     default:
       return state
   }

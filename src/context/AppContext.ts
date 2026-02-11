@@ -12,6 +12,10 @@ export interface AppState {
   selectedNodeId: string | null
   searchQuery: string
   status: StatusMessage | null
+  // Zoom/Pan state for Epic 4
+  zoomLevel: number
+  panX: number
+  panY: number
 }
 
 // Action Types
@@ -26,6 +30,9 @@ export type AppAction =
   | { type: 'SET_SEARCH_QUERY'; payload: string }
   | { type: 'SET_STATUS'; payload: StatusMessage | null }
   | { type: 'RESET_FILE' }
+  | { type: 'SET_ZOOM'; payload: number }
+  | { type: 'SET_PAN'; payload: { x: number; y: number } }
+  | { type: 'RESET_ZOOM_PAN' }
 
 // Context
 export const AppContext = createContext<{
