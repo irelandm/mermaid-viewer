@@ -80,14 +80,14 @@ describe('usePanzoom', () => {
       result.current.initPanzoom(mockSvgElement)
     })
 
-    expect(mockPanzoomFn).toHaveBeenCalledWith(
-      mockSvgElement,
-      expect.objectContaining({
-        maxZoom: 5,
-        minZoom: 0.5,
-        smoothScroll: false,
-      }),
-    )
+    // Verify panzoom was called with the SVG element and correct config
+    // (avoid objectContaining – vitest chokes on function properties)
+    expect(mockPanzoomFn).toHaveBeenCalledTimes(1)
+    const call = mockPanzoomFn.mock.calls[0] as unknown as [SVGSVGElement, Record<string, unknown>]
+    expect(call[0]).toBe(mockSvgElement)
+    expect(call[1].maxZoom).toBe(5)
+    expect(call[1].minZoom).toBe(0.5)
+    expect(call[1].smoothScroll).toBe(false)
   })
 
   it('should not initialize panzoom until initPanzoom is called', () => {
@@ -132,6 +132,9 @@ describe('usePanzoom', () => {
 
     expect(mockOn).toHaveBeenCalledWith('zoom', expect.any(Function))
     expect(mockOn).toHaveBeenCalledWith('pan', expect.any(Function))
+    // Story 4.2: Pan with click-drag & inertial momentum
+    expect(mockOn).toHaveBeenCalledWith('dragstart', expect.any(Function))
+    expect(mockOn).toHaveBeenCalledWith('dragend', expect.any(Function))
   })
 
   it('should call moveTo and zoomAbs on resetView', () => {

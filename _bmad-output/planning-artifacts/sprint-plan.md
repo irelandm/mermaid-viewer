@@ -89,7 +89,7 @@ Single-developer kanban workflow executing 37 MVP stories across 7 epics in sequ
 ---
 
 ### Epic 4: Navigation & Zoom/Pan Interactions
-**Status:** 🟢 Ready to Start  
+**Status:** 🔵 In Progress (4/6 complete)  
 **Dependency:** Epic 3 complete ✅  
 **Completion Criteria:** Smooth, responsive zoom and pan with wheel scroll, buttons, keyboard, and reset
 
@@ -97,10 +97,10 @@ Single-developer kanban workflow executing 37 MVP stories across 7 epics in sequ
 
 | # | Story | Prerequisite | Exit Criteria | Status |
 |---|-------|--------------|---------------|--------|
-| 4.6 | Create Zoom/Pan Controller Hook & Integrate Panzoom Library | 3.4 | panzoom library initialized, zoom/pan state in AppContext | To Do |
-| 4.1 | Implement Zoom with Wheel Scroll (Cursor-Centered) | 4.6 | Scroll wheel zooms diagram, centered on cursor, range 0.5x–5x | To Do |
-| 4.2 | Implement Pan with Click-Drag & Inertial Momentum | 4.1 | Click-drag pans smoothly, inertia continues after release (~500–800ms decay) | To Do |
-| 4.3 | Create Zoom Controls (Plus/Minus Buttons) | 4.2 | +/− buttons in toolbar, incremental zoom from canvas center | To Do |
+| 4.6 | Create Zoom/Pan Controller Hook & Integrate Panzoom Library | 3.4 | panzoom library initialized, zoom/pan state in AppContext | Done |
+| 4.1 | Implement Zoom with Wheel Scroll (Cursor-Centered) | 4.6 | Scroll wheel zooms diagram, centered on cursor, range 0.5x–5x | Done |
+| 4.2 | Implement Pan with Click-Drag & Inertial Momentum | 4.1 | Click-drag pans smoothly, inertia continues after release (~500–800ms decay) | Done |
+| 4.3 | Create Zoom Controls (Plus/Minus Buttons) | 4.2 | +/− buttons in toolbar, incremental zoom from canvas center | Done |
 | 4.4 | Implement Reset View Button | 4.3 | Reset button returns diagram to initial auto-fit state with 300–500ms animation | To Do |
 | 4.5 | Add Keyboard Zoom Shortcuts (+ and − Keys) | 4.4 | +/− keys zoom diagram (canvas center), work with or without search focus | To Do |
 
@@ -302,7 +302,8 @@ If a second developer joins later, these epics can start independently:
 ## Current Status
 
 **✅ Completed:** Epic 1 (Foundation) + Epic 2 (File Handling) + Epic 3 (Diagram Rendering)  
-**🟢 Next Up:** Epic 4 – Story 4.6 (Create Zoom/Pan Controller Hook)
+**🔵 In Progress:** Epic 4 – Stories 4.6, 4.1, 4.2, 4.3 Done (panzoom hook, wheel zoom, drag-pan w/ inertia, zoom buttons)  
+**🟢 Next Up:** Epic 4 – Story 4.4 (Implement Reset View Button)
 
 Marki, solid progress! Foundation, file handling, and rendering complete. Ready for zoom/pan interactions. Each epic completes a major feature area, and you can't start the next without finishing the current one (due to dependencies).
 

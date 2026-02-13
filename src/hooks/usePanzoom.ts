@@ -58,6 +58,26 @@ export function usePanzoom() {
       const transform = instance.getTransform()
       dispatch({ type: 'SET_PAN', payload: { x: transform.x, y: transform.y } })
     })
+
+    // Track drag start/end for UI feedback if needed (Story 4.2)
+    instance.on('dragstart', () => {
+      // Drag started - can be used for cursor changes or feedback
+      if (element && element.style) {
+        element.style.cursor = 'grabbing'
+      }
+    })
+
+    instance.on('dragend', () => {
+      // Drag ended - inertia will continue via panzoom's internal physics
+      if (element && element.style) {
+        element.style.cursor = 'grab'
+      }
+    })
+
+    // Set initial cursor state
+    if (element && element.style) {
+      element.style.cursor = 'grab'
+    }
   }, [dispatch])
 
   /** Dispose the current panzoom instance. Call on unmount. */
