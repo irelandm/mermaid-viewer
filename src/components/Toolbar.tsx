@@ -4,7 +4,7 @@ import { parseMarkdown } from '../utils/parseMarkdown'
 
 export function Toolbar() {
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const { state, dispatch } = useAppState()
+  const { state, dispatch, zoomHandlers } = useAppState()
 
   const handleOpenFile = () => {
     fileInputRef.current?.click()
@@ -83,6 +83,39 @@ export function Toolbar() {
       >
         Open File
       </button>
+
+      {/* Zoom Controls (Epic 4 - Story 4.3) */}
+      {state.mermaidCode && zoomHandlers && (
+        <div className="flex items-center gap-1 ml-2 border-l border-gray-700 pl-2">
+          <button
+            onClick={zoomHandlers.zoomOut}
+            className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-gray-800 hover:bg-gray-700 text-white rounded transition-colors focus:outline-2 focus:outline-cyan-400"
+            aria-label="Zoom out"
+            title="Zoom out"
+          >
+            <span className="text-lg font-bold">−</span>
+          </button>
+          <span className="text-sm text-gray-400 min-w-[3rem] text-center">
+            {Math.round(state.zoomLevel * 100)}%
+          </span>
+          <button
+            onClick={zoomHandlers.zoomIn}
+            className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-gray-800 hover:bg-gray-700 text-white rounded transition-colors focus:outline-2 focus:outline-cyan-400"
+            aria-label="Zoom in"
+            title="Zoom in"
+          >
+            <span className="text-lg font-bold">+</span>
+          </button>
+          <button
+            onClick={zoomHandlers.resetView}
+            className="flex-shrink-0 px-3 py-1 text-sm bg-gray-800 hover:bg-gray-700 text-white rounded transition-colors focus:outline-2 focus:outline-cyan-400 ml-1"
+            aria-label="Reset view"
+            title="Reset view"
+          >
+            Reset
+          </button>
+        </div>
+      )}
 
       <input
         ref={fileInputRef}

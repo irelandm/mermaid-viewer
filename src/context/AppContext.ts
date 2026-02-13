@@ -1,6 +1,13 @@
 import React, { createContext } from 'react'
 import type { StatusMessage } from '../types'
 
+// Zoom handler callbacks
+export interface ZoomHandlers {
+  zoomIn: () => void
+  zoomOut: () => void
+  resetView: () => void
+}
+
 // App State Types
 export interface AppState {
   theme: 'dark' | 'light'
@@ -38,4 +45,6 @@ export type AppAction =
 export const AppContext = createContext<{
   state: AppState
   dispatch: React.Dispatch<AppAction>
+  zoomHandlers: ZoomHandlers | null
+  setZoomHandlers: (handlers: ZoomHandlers | null) => void
 } | undefined>(undefined)

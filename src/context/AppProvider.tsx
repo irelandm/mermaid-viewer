@@ -1,5 +1,5 @@
-import { useReducer, type ReactNode } from 'react'
-import { AppContext, type AppState, type AppAction } from './AppContext'
+import { useReducer, useState, type ReactNode } from 'react'
+import { AppContext, type AppState, type AppAction, type ZoomHandlers } from './AppContext'
 
 // Initial State
 const initialState: AppState = {
@@ -68,9 +68,10 @@ interface AppProviderProps {
 // Provider Component
 export function AppProvider({ children }: AppProviderProps) {
   const [state, dispatch] = useReducer(appReducer, initialState)
+  const [zoomHandlers, setZoomHandlers] = useState<ZoomHandlers | null>(null)
 
   return (
-    <AppContext.Provider value={{ state, dispatch }}>
+    <AppContext.Provider value={{ state, dispatch, zoomHandlers, setZoomHandlers }}>
       {children}
     </AppContext.Provider>
   )
