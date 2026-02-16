@@ -1,6 +1,6 @@
 import { useRef, useCallback } from 'react'
 import panzoom from 'panzoom'
-import type { PanZoom } from 'panzoom'
+import type { PanZoom, Transform } from 'panzoom'
 import { useAppState } from '../context/useAppState'
 
 /**
@@ -14,6 +14,9 @@ export function usePanzoom() {
   const { state, dispatch } = useAppState()
   const panzoomInstanceRef = useRef<PanZoom | null>(null)
   const currentElementRef = useRef<SVGSVGElement | null>(null)
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const autoFitTransformRef = useRef<Transform | null>(null)
+  const resetAnimationRef = useRef<number | null>(null)
 
   /**
    * Initialize (or re-initialize) panzoom on the given SVG element.
@@ -89,12 +92,58 @@ export function usePanzoom() {
     }
   }, [])
 
-  /** Reset zoom/pan to initial state (scale 1, origin 0,0) */
+  /** Reset zoom/pan to initial auto-fit state with smooth 400ms animation */
   const resetView = useCallback(() => {
     const instance = panzoomInstanceRef.current
     if (!instance) return
-    instance.moveTo(0, 0)
-    instance.zoomAbs(0, 0, 1)
+
+    // Cancel any in-flight reset animation
+    if (resetAnimationRef.current) {
+      cancelAnimationFrame(resetAnimationRef.current)
+      resetAnimationRef.current = null
+    }
+
+    const target = autoFitTransformRef.current
+    if (!target) {
+      // Fallback: snap to origin
+      instance.moveTo(0, 0)
+      instance.zoomAbs(0, 0, 1)
+      dispatch({ type: 'RESET_ZOOM_PAN' })
+      return
+    }
+
+    // Pause panzoom during animation so user gestures don't interfere
+    instance.pause()
+
+    const start = instance.getTransform()
+    const duration = 400 // ms
+    const t0 = performance.now()
+
+    const step = (now: number) => {
+      const elapsed = now - t0
+      // Ease-out cubic for a natural deceleration feel
+      const raw = Math.min(elapsed / duration, 1)
+      const t = 1 - Math.pow(1 - raw, 3)
+
+      const x = start.x + (target.x - start.x) * t
+      const y = start.y + (target.y - start.y) * t
+      const scale = start.scale + (target.scale - start.scale) * t
+
+      instance.moveTo(x, y)
+      instance.zoomAbs(0, 0, scale)
+
+      if (raw < 1) {
+        resetAnimationRef.current = requestAnimationFrame(step)
+      } else {
+        // Ensure we land exactly on the target
+        instance.moveTo(target.x, target.y)
+        instance.zoomAbs(0, 0, target.scale)
+        resetAnimationRef.current = null
+        instance.resume()
+      }
+    }
+
+    resetAnimationRef.current = requestAnimationFrame(step)
     dispatch({ type: 'RESET_ZOOM_PAN' })
   }, [dispatch])
 
@@ -142,6 +191,7 @@ export function usePanzoom() {
   /**
    * Auto-fit the SVG diagram into its container.
    * Sets the SVG to its natural size and uses panzoom to scale/position it.
+   * Stores the computed state for use by resetView().
    */
   const autoFit = useCallback((container: HTMLDivElement) => {
     const instance = panzoomInstanceRef.current
@@ -171,6 +221,11 @@ export function usePanzoom() {
       // Apply transform
       instance.moveTo(offsetX, offsetY)
       instance.zoomAbs(offsetX, offsetY, initialScale)
+
+      // Capture the *actual* panzoom transform for resetView (Story 4.4).
+      // zoomAbs recalculates x/y internally, so we must read it back.
+      autoFitTransformRef.current = { ...instance.getTransform() }
+      containerRef.current = container
     } catch (error) {
       console.error('Error auto-fitting diagram:', error)
     }
