@@ -41,6 +41,29 @@ export function SVGCanvas() {
     return () => setZoomHandlers(null)
   }, [zoomBy, resetView, setZoomHandlers])
 
+  // Keyboard zoom shortcuts (Epic 4 - Story 4.5)
+  useEffect(() => {
+    const ZOOM_STEP = 0.2
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Only respond to + and - keys (handle both + and = on US keyboard)
+      if (event.key === '+' || event.key === '=') {
+        event.preventDefault()
+        zoomBy(ZOOM_STEP)
+      } else if (event.key === '-' || event.key === '_') {
+        event.preventDefault()
+        zoomBy(-ZOOM_STEP)
+      }
+    }
+
+    // Add listener to document so it works even when search input is focused
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [zoomBy])
+
   useEffect(() => {
     const renderDiagram = async () => {
       if (!state.mermaidCode || !containerRef.current) {
