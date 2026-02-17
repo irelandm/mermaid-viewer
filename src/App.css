@@ -82,3 +82,44 @@ svg g.node-selected,
 svg g.node.node-selected {
   filter: drop-shadow(0 0 4px rgba(0, 212, 255, 0.5)) !important;
 }
+
+/* Epic 5 - Story 5.3: Connected Nodes & Edges Highlighting */
+/* Apply to nodes that are connected to the selected node */
+svg g.node-connected rect,
+svg g.node.node-connected rect,
+svg .node-connected rect,
+svg g.node-connected ellipse,
+svg g.node.node-connected ellipse,
+svg .node-connected ellipse,
+svg g.node-connected circle,
+svg g.node.node-connected circle,
+svg .node-connected circle,
+svg g.node-connected polygon,
+svg g.node.node-connected polygon,
+svg .node-connected polygon,
+svg g.node-connected path,
+svg g.node.node-connected path,
+svg .node-connected path {
+  stroke: #ffb800 !important;
+  stroke-width: 1.5px !important;
+  opacity: 0.8 !important;
+}
+
+/* Apply to edges that connect to the selected node */
+/* Mermaid v11: edges are <path> with class "flowchart-link" inside <g class="edgePaths"> */
+svg path.edge-connected,
+svg .edgePaths path.edge-connected,
+svg path.flowchart-link.edge-connected {
+  stroke: #ffb800 !important;
+  stroke-width: 2.5px !important;
+}
+
+/* Edge markers (arrowheads) for connected edges */
+svg .edge-connected marker path,
+svg .edge-connected marker polygon,
+svg [class*="edge-connected"] marker path,
+svg [class*="edge-connected"] marker polygon {
+  fill: #ffb800 !important;
+  stroke: #ffb800 !important;
+}
+

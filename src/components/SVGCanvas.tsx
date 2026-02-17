@@ -3,6 +3,7 @@ import mermaid from 'mermaid'
 import { useAppState } from '../context/useAppState'
 import { LoadingSpinner } from './LoadingSpinner'
 import { usePanzoom } from '../hooks/usePanzoom'
+import { clearConnectedClasses, applyConnectedHighlighting } from '../utils/svgNodeHelpers'
 
 /**
  * SVGCanvas component renders Mermaid diagrams to SVG and auto-fits to viewport
@@ -177,18 +178,22 @@ export function SVGCanvas() {
 
   /**
    * Apply node selection styling via CSS class (Epic 5 - Story 5.2)
+   * and connected node/edge highlighting (Epic 5 - Story 5.3)
    * Updates whenever selectedNodeId changes
    */
   useEffect(() => {
     if (!containerRef.current) return
 
-    const svg = containerRef.current.querySelector('svg')
+    const svg = containerRef.current.querySelector('svg') as SVGSVGElement
     if (!svg) return
 
     // Remove previous selection highlighting
     svg.querySelectorAll('.node-selected').forEach(el => {
       el.classList.remove('node-selected')
     })
+
+    // Clear previous connected highlighting (Epic 5 - Story 5.3)
+    clearConnectedClasses(svg)
 
     // Apply selection to current node
     if (state.selectedNodeId) {
@@ -208,6 +213,9 @@ export function SVGCanvas() {
       if (selectedElement) {
         selectedElement.classList.add('node-selected')
       }
+
+      // Apply connected node/edge highlighting (Epic 5 - Story 5.3)
+      applyConnectedHighlighting(state.selectedNodeId, svg)
     }
   }, [state.selectedNodeId])
 

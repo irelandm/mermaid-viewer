@@ -117,17 +117,17 @@ Single-developer kanban workflow executing 37 MVP stories across 7 epics in sequ
 ---
 
 ### Epic 5: Node Selection & Side Panel
-**Status:** Blocked (Waiting for Epic 4)  
-**Dependency:** Epic 4 complete  
+**Status:** In Progress (2/6 complete)  
+**Dependency:** Epic 4 complete ✅  
 **Completion Criteria:** Nodes selectable with visual feedback and side panel showing metadata
 
 **Story Sequence:**
 
 | # | Story | Prerequisite | Exit Criteria | Status |
 |---|-------|--------------|---------------|--------|
-| 5.1 | Implement Node Click Detection via Event Delegation | 4.5 | Single click listener on SVG root, nodes identified by data-node-id or id | To Do |
-| 5.2 | Apply Visual Selection Styling (Color Swap & Glow) | 5.1 | `.node-selected` class applied, node color swaps to accent (#00d4ff), subtle glow visible | To Do |
-| 5.3 | Highlight Connected Nodes & Edges | 5.2 | `.node-connected` and `.edge-connected` classes applied, edges bold in accent color | To Do |
+| 5.1 | Implement Node Click Detection via Event Delegation | 4.5 | Single click listener on SVG root, nodes identified by class 'node', event delegation pattern | Done ✅ |
+| 5.2 | Apply Visual Selection Styling (Color Swap & Glow) | 5.1 | `.node-selected` class applied with cyan stroke border, subtle glow visible, text light colored | Done ✅ |
+| 5.3 | Highlight Connected Nodes & Edges | 5.2 | `.node-connected` and `.edge-connected` classes applied, edges bold in accent color | Done |
 | 5.4 | Display Node Hover Tooltip (Label + ID) | 5.3 | Tooltip appears on hover with "Label – node_id" format, positioned 4–8px from cursor | To Do |
 | 5.5 | Create Side Panel Component Structure | 5.4 | Panel appears on right (280px fixed width), sticky positioning, close button works | To Do |
 | 5.6 | Display Selected Node Metadata in Side Panel | 5.5 | Panel shows Node ID, Label, Connected Edges list; scrollable if content overflows | To Do |
@@ -302,6 +302,11 @@ If a second developer joins later, these epics can start independently:
 ## Current Status
 
 **✅ Completed:** Epic 1 (Foundation) + Epic 2 (File Handling) + Epic 3 (Diagram Rendering) + Epic 4 (Zoom/Pan Navigation)  
-**🟢 Next Up:** Epic 5 – Story 5.1 (Implement Node Click Detection via Event Delegation)
+**🟢 In Progress:** Epic 5 – Node Selection (2/6 complete: 5.1 ✅ 5.2 ✅)
+**⏭️ Next Up:** Epic 5 – Story 5.4 (Display Node Hover Tooltip)
 
-Marki, Epic 4 complete! All 6 navigation and zoom/pan stories done. Keyboard zoom shortcuts (+ and - keys) now working alongside wheel scroll, button controls, and reset view. Excellent progress! Ready to tackle node selection in Epic 5. 🚀
+Marki, Epic 5 is now live! Stories 5.1 and 5.2 complete:
+- 5.1: Single click listener with event delegation on SVG root, node detection working
+- 5.2: Visual selection styling with cyan stroke border + subtle glow, no text clipping
+
+Next: Implement connected node/edge highlighting when a node is selected. 🚀

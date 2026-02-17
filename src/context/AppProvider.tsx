@@ -63,11 +63,12 @@ function appReducer(state: AppState, action: AppAction): AppState {
 // Provider Props
 interface AppProviderProps {
   children: ReactNode
+  initialState?: Partial<AppState>
 }
 
 // Provider Component
-export function AppProvider({ children }: AppProviderProps) {
-  const [state, dispatch] = useReducer(appReducer, initialState)
+export function AppProvider({ children, initialState: overrideState }: AppProviderProps) {
+  const [state, dispatch] = useReducer(appReducer, { ...initialState, ...overrideState })
   const [zoomHandlers, setZoomHandlers] = useState<ZoomHandlers | null>(null)
 
   return (
