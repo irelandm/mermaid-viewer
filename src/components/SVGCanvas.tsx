@@ -36,6 +36,10 @@ export function SVGCanvas() {
       startOnLoad: false,
       theme: 'dark',
       securityLevel: 'loose',
+      themeVariables: {
+        clusterBkg: 'rgba(255, 255, 255, 0.03)',
+        clusterBorder: 'rgba(255, 255, 255, 0.12)',
+      },
     })
   }, [])
 

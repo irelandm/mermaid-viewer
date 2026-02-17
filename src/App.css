@@ -124,6 +124,26 @@ svg [class*="edge-connected"] marker polygon {
 }
 
 /* Epic 5 - Story 5.4: Node Hover Tooltip */
+
+/* Subtle styling for subgraph/cluster containers */
+svg .cluster rect,
+svg g.cluster rect {
+  fill: rgba(255, 255, 255, 0.03) !important;
+  stroke: rgba(255, 255, 255, 0.12) !important;
+  stroke-width: 1px !important;
+  rx: 6px !important;
+  ry: 6px !important;
+}
+
+svg .cluster text,
+svg g.cluster text,
+svg .cluster .nodeLabel,
+svg g.cluster .nodeLabel {
+  fill: rgba(255, 255, 255, 0.4) !important;
+  color: rgba(255, 255, 255, 0.4) !important;
+  font-size: 0.85em !important;
+}
+
 .node-tooltip {
   background-color: rgba(15, 18, 35, 0.95);
   color: #f0f2f5;
