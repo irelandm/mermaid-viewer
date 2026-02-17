@@ -40,3 +40,45 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Epic 5 - Story 5.2: Node Selection Styling */
+/* Color swap and glow effect for selected nodes */
+/* Ultra-aggressive selectors to override Mermaid's inline styles */
+svg g.node-selected rect,
+svg g.node.node-selected rect,
+svg .node-selected rect,
+svg g.node-selected ellipse,
+svg g.node.node-selected ellipse,
+svg .node-selected ellipse,
+svg g.node-selected circle,
+svg g.node.node-selected circle,
+svg .node-selected circle,
+svg g.node-selected polygon,
+svg g.node.node-selected polygon,
+svg .node-selected polygon,
+svg g.node-selected path,
+svg g.node.node-selected path,
+svg .node-selected path {
+  stroke: #00d4ff !important;
+  stroke-width: 2.5px !important;
+}
+
+/* Keep text readable on selected nodes */
+svg g.node-selected text,
+svg g.node.node-selected text,
+svg .node-selected text,
+svg g.node-selected .nodeLabel,
+svg g.node.node-selected .nodeLabel,
+svg .node-selected .nodeLabel,
+svg g.node-selected span,
+svg g.node.node-selected span,
+svg .node-selected span {
+  fill: #e0f7ff !important;
+  color: #e0f7ff !important;
+}
+
+/* Glow effect on the entire node group */
+svg g.node-selected,
+svg g.node.node-selected {
+  filter: drop-shadow(0 0 4px rgba(0, 212, 255, 0.5)) !important;
+}

@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import './App.css'
 import { Status } from './components/Status'
 import { Toolbar } from './components/Toolbar'
 import { SVGCanvas } from './components/SVGCanvas'

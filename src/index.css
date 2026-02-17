@@ -43,6 +43,7 @@ body {
   min-height: 100vh;
   width: 100%;
   height: 100%;
+  background-color: #0a0e27;
 }
 
 h1 {
@@ -72,7 +73,8 @@ button:focus-visible {
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
-    background-color: #ffffff;
+    /* Keep dark background - we control theme via Tailwind dark class */
+    background-color: #0a0e27;
   }
   a:hover {
     color: #747bff;

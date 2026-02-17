@@ -64,6 +64,54 @@ export function SVGCanvas() {
     }
   }, [zoomBy])
 
+  /**
+   * Extract node ID from element by traversing up the DOM tree
+   * Mermaid uses elements with id like "flowchart-A-0" or class "node"
+   */
+  const getNodeIdFromElement = (element: Element): string | null => {
+    let current: Element | null = element
+    while (current && current !== containerRef.current) {
+      // Check if this is a node group element (has class "node")
+      if (current.classList.contains('node')) {
+        // Return the ID of this element
+        return current.id || null
+      }
+      // Check for data-node-id attribute (custom attribute)
+      const nodeId = current.getAttribute('data-node-id')
+      if (nodeId) {
+        return nodeId
+      }
+      current = current.parentElement
+    }
+    return null
+  }
+
+  /**
+   * Handle node selection via click delegation (Epic 5 - Story 5.1)
+   * Single listener pattern for 2000+ nodes
+   */
+  useEffect(() => {
+    const svgContainer = containerRef.current
+    if (!svgContainer) return
+
+    const handleSvgClick = (event: MouseEvent) => {
+      const clickedElement = event.target as Element
+      const nodeId = getNodeIdFromElement(clickedElement)
+
+      if (nodeId) {
+        dispatch({ type: 'SET_SELECTED_NODE', payload: nodeId })
+      } else {
+        dispatch({ type: 'SET_SELECTED_NODE', payload: null })
+      }
+    }
+
+    svgContainer.addEventListener('click', handleSvgClick)
+
+    return () => {
+      svgContainer.removeEventListener('click', handleSvgClick)
+    }
+  }, [dispatch])
+
   useEffect(() => {
     const renderDiagram = async () => {
       if (!state.mermaidCode || !containerRef.current) {
@@ -126,6 +174,42 @@ export function SVGCanvas() {
 
     renderDiagram()
   }, [state.mermaidCode, dispatch, initPanzoom, disposePanzoom, autoFit])
+
+  /**
+   * Apply node selection styling via CSS class (Epic 5 - Story 5.2)
+   * Updates whenever selectedNodeId changes
+   */
+  useEffect(() => {
+    if (!containerRef.current) return
+
+    const svg = containerRef.current.querySelector('svg')
+    if (!svg) return
+
+    // Remove previous selection highlighting
+    svg.querySelectorAll('.node-selected').forEach(el => {
+      el.classList.remove('node-selected')
+    })
+
+    // Apply selection to current node
+    if (state.selectedNodeId) {
+      // Find the node element - it should be a <g> with class "node" and id matching selectedNodeId
+      let selectedElement: Element | null = svg.querySelector(`g.node#${CSS.escape(state.selectedNodeId)}`)
+
+      // Fallback: try just by ID
+      if (!selectedElement) {
+        selectedElement = svg.getElementById(state.selectedNodeId)
+      }
+
+      // Fallback: try data-node-id attribute
+      if (!selectedElement) {
+        selectedElement = svg.querySelector(`[data-node-id="${state.selectedNodeId}"]`)
+      }
+
+      if (selectedElement) {
+        selectedElement.classList.add('node-selected')
+      }
+    }
+  }, [state.selectedNodeId])
 
   if (!state.mermaidCode) {
     return null
