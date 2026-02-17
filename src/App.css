@@ -123,3 +123,34 @@ svg [class*="edge-connected"] marker polygon {
   stroke: #ffb800 !important;
 }
 
+/* Epic 5 - Story 5.4: Node Hover Tooltip */
+.node-tooltip {
+  background-color: rgba(15, 18, 35, 0.95);
+  color: #f0f2f5;
+  font-size: 13px;
+  line-height: 1.4;
+  padding: 6px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.node-tooltip-label {
+  font-weight: 500;
+}
+
+.node-tooltip-separator {
+  color: #6b7280;
+  margin: 0 1px;
+}
+
+.node-tooltip-id {
+  color: #9ca3af;
+  font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+  font-size: 12px;
+}
+

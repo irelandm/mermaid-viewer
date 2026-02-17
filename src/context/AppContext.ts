@@ -1,5 +1,5 @@
 import React, { createContext } from 'react'
-import type { StatusMessage } from '../types'
+import type { StatusMessage, NodeMetadata } from '../types'
 
 // Zoom handler callbacks
 export interface ZoomHandlers {
@@ -17,6 +17,7 @@ export interface AppState {
   error: string | null
   isLoading: boolean
   selectedNodeId: string | null
+  selectedNodeMeta: NodeMetadata | null
   searchQuery: string
   status: StatusMessage | null
   // Zoom/Pan state for Epic 4
@@ -34,6 +35,7 @@ export type AppAction =
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_SELECTED_NODE'; payload: string | null }
+  | { type: 'SET_SELECTED_NODE_META'; payload: NodeMetadata | null }
   | { type: 'SET_SEARCH_QUERY'; payload: string }
   | { type: 'SET_STATUS'; payload: StatusMessage | null }
   | { type: 'RESET_FILE' }

@@ -3,6 +3,7 @@ import './App.css'
 import { Status } from './components/Status'
 import { Toolbar } from './components/Toolbar'
 import { SVGCanvas } from './components/SVGCanvas'
+import { SidePanel } from './components/SidePanel'
 import { useAppState } from './context/useAppState'
 
 function AppContent() {
@@ -18,7 +19,10 @@ function AppContent() {
       <Toolbar />
       <Status />
       {state.mermaidCode ? (
-        <SVGCanvas />
+        <div className="flex flex-1 overflow-hidden">
+          <SVGCanvas />
+          <SidePanel />
+        </div>
       ) : (
         <main className="flex-1 flex flex-col items-center justify-center p-8">
           <h1 className="text-3xl font-bold text-gray-100 mb-4">

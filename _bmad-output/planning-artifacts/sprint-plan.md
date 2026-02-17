@@ -128,9 +128,9 @@ Single-developer kanban workflow executing 37 MVP stories across 7 epics in sequ
 | 5.1 | Implement Node Click Detection via Event Delegation | 4.5 | Single click listener on SVG root, nodes identified by class 'node', event delegation pattern | Done ✅ |
 | 5.2 | Apply Visual Selection Styling (Color Swap & Glow) | 5.1 | `.node-selected` class applied with cyan stroke border, subtle glow visible, text light colored | Done ✅ |
 | 5.3 | Highlight Connected Nodes & Edges | 5.2 | `.node-connected` and `.edge-connected` classes applied, edges bold in accent color | Done |
-| 5.4 | Display Node Hover Tooltip (Label + ID) | 5.3 | Tooltip appears on hover with "Label – node_id" format, positioned 4–8px from cursor | To Do |
-| 5.5 | Create Side Panel Component Structure | 5.4 | Panel appears on right (280px fixed width), sticky positioning, close button works | To Do |
-| 5.6 | Display Selected Node Metadata in Side Panel | 5.5 | Panel shows Node ID, Label, Connected Edges list; scrollable if content overflows | To Do |
+| 5.4 | Display Node Hover Tooltip (Label + ID) | 5.3 | Tooltip appears on hover with "Label – node_id" format, positioned 4–8px from cursor | Done |
+| 5.5 | Create Side Panel Component Structure | 5.4 | Panel appears on right (280px fixed width), sticky positioning, close button works | Done |
+| 5.6 | Display Selected Node Metadata in Side Panel | 5.5 | Panel shows Node ID, Label, Connected Edges list; scrollable if content overflows | Done |
 
 **Completion Gate:**
 - Click a node → color changes, glow visible, connected nodes/edges highlighted
@@ -301,9 +301,9 @@ If a second developer joins later, these epics can start independently:
 
 ## Current Status
 
-**✅ Completed:** Epic 1 (Foundation) + Epic 2 (File Handling) + Epic 3 (Diagram Rendering) + Epic 4 (Zoom/Pan Navigation)  
-**🟢 In Progress:** Epic 5 – Node Selection (2/6 complete: 5.1 ✅ 5.2 ✅)
-**⏭️ Next Up:** Epic 5 – Story 5.4 (Display Node Hover Tooltip)
+**✅ Completed:** Epic 1 (Foundation) + Epic 2 (File Handling) + Epic 3 (Diagram Rendering) + Epic 4 (Zoom/Pan Navigation) + Epic 5 (Node Selection & Side Panel)  
+**🟢 In Progress:** Epic 6 – Search & Filtering
+**⏭️ Next Up:** Epic 6 – Story 6.1 (Create Search Input in Toolbar)
 
 Marki, Epic 5 is now live! Stories 5.1 and 5.2 complete:
 - 5.1: Single click listener with event delegation on SVG root, node detection working

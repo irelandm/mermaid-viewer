@@ -1,9 +1,11 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import mermaid from 'mermaid'
 import { useAppState } from '../context/useAppState'
 import { LoadingSpinner } from './LoadingSpinner'
+import { Tooltip } from './Tooltip'
 import { usePanzoom } from '../hooks/usePanzoom'
-import { clearConnectedClasses, applyConnectedHighlighting } from '../utils/svgNodeHelpers'
+import { clearConnectedClasses, applyConnectedHighlighting, findConnections, extractBareId, buildNodeIdMap, buildEdgeMap } from '../utils/svgNodeHelpers'
+import type { NodeMetadata, NodeConnection } from '../types'
 
 /**
  * SVGCanvas component renders Mermaid diagrams to SVG and auto-fits to viewport
@@ -14,6 +16,14 @@ export function SVGCanvas() {
 
   // Initialize panzoom hook (Epic 4)
   const { initPanzoom, disposePanzoom, autoFit, resetView, zoomBy } = usePanzoom()
+
+  // Hover tooltip state (Epic 5 - Story 5.4)
+  const [hoverInfo, setHoverInfo] = useState<{
+    label: string
+    nodeId: string
+    x: number
+    y: number
+  } | null>(null)
 
   // Cleanup panzoom on unmount
   useEffect(() => {
@@ -112,6 +122,84 @@ export function SVGCanvas() {
       svgContainer.removeEventListener('click', handleSvgClick)
     }
   }, [dispatch])
+
+  /**
+   * Handle node hover tooltip via event delegation (Epic 5 - Story 5.4)
+   * Shows tooltip with "Label – node_id" on mouseover, hides on mouseout
+   */
+  useEffect(() => {
+    const svgContainer = containerRef.current
+    if (!svgContainer) return
+
+    const handleMouseOver = (event: MouseEvent) => {
+      const target = event.target as Element
+      const nodeId = getNodeIdFromElement(target)
+
+      if (nodeId) {
+        // Find the node group element to extract label
+        let nodeEl: Element | null = target
+        while (nodeEl && !nodeEl.classList.contains('node')) {
+          nodeEl = nodeEl.parentElement
+        }
+
+        // Extract label from .nodeLabel text content
+        let label = ''
+        if (nodeEl) {
+          const labelEl = nodeEl.querySelector('.nodeLabel')
+          if (labelEl) {
+            label = labelEl.textContent?.trim() || ''
+          }
+          // Fallback: try text element directly
+          if (!label) {
+            const textEl = nodeEl.querySelector('text')
+            label = textEl?.textContent?.trim() || ''
+          }
+        }
+
+        const bareId = extractBareId(nodeId)
+
+        setHoverInfo({
+          label: label || bareId,
+          nodeId: bareId,
+          x: event.clientX,
+          y: event.clientY,
+        })
+      }
+    }
+
+    const handleMouseOut = (event: MouseEvent) => {
+      const relatedTarget = event.relatedTarget as Element | null
+      // Only hide if we're leaving a node (not moving between child elements)
+      if (relatedTarget) {
+        const stillInNode = getNodeIdFromElement(relatedTarget)
+        if (stillInNode) return
+      }
+      setHoverInfo(null)
+    }
+
+    const handleMouseMove = (event: MouseEvent) => {
+      // Update tooltip position as mouse moves within a node
+      setHoverInfo(prev => {
+        if (!prev) return null
+        return { ...prev, x: event.clientX, y: event.clientY }
+      })
+    }
+
+    svgContainer.addEventListener('mouseover', handleMouseOver)
+    svgContainer.addEventListener('mouseout', handleMouseOut)
+    svgContainer.addEventListener('mousemove', handleMouseMove)
+
+    return () => {
+      svgContainer.removeEventListener('mouseover', handleMouseOver)
+      svgContainer.removeEventListener('mouseout', handleMouseOut)
+      svgContainer.removeEventListener('mousemove', handleMouseMove)
+    }
+  }, [])
+
+  // Hide tooltip on click (selecting a node should dismiss tooltip)
+  useEffect(() => {
+    setHoverInfo(null)
+  }, [state.selectedNodeId])
 
   useEffect(() => {
     const renderDiagram = async () => {
@@ -216,8 +304,58 @@ export function SVGCanvas() {
 
       // Apply connected node/edge highlighting (Epic 5 - Story 5.3)
       applyConnectedHighlighting(state.selectedNodeId, svg)
+
+      // Compute node metadata for SidePanel (Epic 5 - Story 5.6)
+      const bareId = extractBareId(state.selectedNodeId)
+
+      // Extract label
+      let label = ''
+      if (selectedElement) {
+        const labelEl = selectedElement.querySelector('.nodeLabel')
+        if (labelEl) {
+          label = labelEl.textContent?.trim() || ''
+        }
+        if (!label) {
+          const textEl = selectedElement.querySelector('text')
+          label = textEl?.textContent?.trim() || ''
+        }
+      }
+
+      // Get connections
+      const { connectedNodeDomIds } = findConnections(state.selectedNodeId, svg)
+      const bareIdToDomId = buildNodeIdMap(svg)
+      const domIdToBareId = new Map<string, string>()
+      bareIdToDomId.forEach((domId, bId) => domIdToBareId.set(domId, bId))
+
+      // Build edge map to determine direction
+      const knownBareIds = Array.from(bareIdToDomId.keys())
+      const edgeList = buildEdgeMap(svg, knownBareIds)
+
+      const connections: NodeConnection[] = connectedNodeDomIds.map(domId => {
+        const targetBareId = domIdToBareId.get(domId) || extractBareId(domId)
+        // Get target label from SVG
+        let targetLabel = targetBareId
+        const targetEl = svg.querySelector(`#${CSS.escape(domId)}`)
+        if (targetEl) {
+          const tLabelEl = targetEl.querySelector('.nodeLabel')
+          if (tLabelEl) targetLabel = tLabelEl.textContent?.trim() || targetBareId
+          else {
+            const tTextEl = targetEl.querySelector('text')
+            targetLabel = tTextEl?.textContent?.trim() || targetBareId
+          }
+        }
+        // Determine direction from edge map
+        const isOutgoing = edgeList.some(e => e.source === bareId && e.target === targetBareId)
+        const direction: 'outgoing' | 'incoming' = isOutgoing ? 'outgoing' : 'incoming'
+        return { edgeSource: bareId, edgeTarget: targetBareId, targetLabel, direction }
+      })
+
+      const meta: NodeMetadata = { bareId, label: label || bareId, connections }
+      dispatch({ type: 'SET_SELECTED_NODE_META', payload: meta })
+    } else {
+      dispatch({ type: 'SET_SELECTED_NODE_META', payload: null })
     }
-  }, [state.selectedNodeId])
+  }, [state.selectedNodeId, dispatch])
 
   if (!state.mermaidCode) {
     return null
@@ -234,6 +372,17 @@ export function SVGCanvas() {
         ref={containerRef}
         className="w-full h-full"
       />
+
+      {/* Node Hover Tooltip (Epic 5 - Story 5.4) */}
+      {hoverInfo && (
+        <Tooltip
+          label={hoverInfo.label}
+          nodeId={hoverInfo.nodeId}
+          x={hoverInfo.x}
+          y={hoverInfo.y}
+          visible={true}
+        />
+      )}
 
       {/* Loading Spinner Overlay */}
       {state.isLoading && (

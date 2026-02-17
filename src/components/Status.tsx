@@ -49,16 +49,16 @@ export function Status() {
         flex items-center justify-between gap-3
       `}
     >
-      <div className="flex items-center gap-3 flex-1">
+      <div className="flex items-center gap-2 flex-1">
         <span className="text-sm">{status.message}</span>
+        <button
+          onClick={() => dispatch({ type: 'SET_STATUS', payload: null })}
+          className="text-xs leading-none opacity-70 hover:opacity-100 transition-opacity"
+          aria-label="Close status message"
+        >
+          ×
+        </button>
       </div>
-      <button
-        onClick={() => dispatch({ type: 'SET_STATUS', payload: null })}
-        className="text-lg leading-none opacity-70 hover:opacity-100 transition-opacity"
-        aria-label="Close status message"
-      >
-        ×
-      </button>
     </div>
   )
 }

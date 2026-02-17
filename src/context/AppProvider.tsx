@@ -10,6 +10,7 @@ const initialState: AppState = {
   error: null,
   isLoading: false,
   selectedNodeId: null,
+  selectedNodeMeta: null,
   searchQuery: '',
   status: null,
   // Zoom/Pan initial state (Epic 4)
@@ -35,6 +36,8 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return { ...state, isLoading: action.payload }
     case 'SET_SELECTED_NODE':
       return { ...state, selectedNodeId: action.payload }
+    case 'SET_SELECTED_NODE_META':
+      return { ...state, selectedNodeMeta: action.payload }
     case 'SET_SEARCH_QUERY':
       return { ...state, searchQuery: action.payload }
     case 'SET_STATUS':
@@ -47,6 +50,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
         mermaidCode: null,
         error: null,
         selectedNodeId: null,
+        selectedNodeMeta: null,
         searchQuery: '',
       }
     case 'SET_ZOOM':

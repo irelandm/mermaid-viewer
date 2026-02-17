@@ -51,6 +51,7 @@ const initialState: AppState = {
   error: null,
   isLoading: false,
   selectedNodeId: null,
+  selectedNodeMeta: null,
   searchQuery: '',
   status: null,
   zoomLevel: 1,
